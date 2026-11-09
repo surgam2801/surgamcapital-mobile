@@ -62,6 +62,7 @@ Thumbs.db
 *.tgz
 *.tar.gz
 *.zip
+*.apk
 .cache/
 
 # Manus/webdev artifacts

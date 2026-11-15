@@ -13,6 +13,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { surgam, type SurgamIconName } from "./theme";
+import { LanguagePicker } from "./language-picker";
+
+export { LanguagePicker };
 
 const iconMap: Record<SurgamIconName, keyof typeof Ionicons.glyphMap> = {
   home: "home-outline",
@@ -84,6 +87,9 @@ export function DesktopRail() {
         })}
       </View>
       <View style={styles.railSpacer} />
+      <View style={{ marginBottom: 14 }}>
+        <LanguagePicker />
+      </View>
       <View style={styles.railTrust}>
         <Icon name="shield" size={20} color={surgam.colors.evergreen} />
         <Text style={styles.railTrustTitle}>A calm place for your plans</Text>
@@ -128,7 +134,10 @@ export function PageHeader({ eyebrow, title, subtitle, right }: { eyebrow?: stri
         <Text style={styles.pageTitle}>{title}</Text>
         {subtitle ? <Text style={styles.pageSubtitle}>{subtitle}</Text> : null}
       </View>
-      {right ? <View style={styles.pageHeaderRight}>{right}</View> : null}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <LanguagePicker compact />
+        {right ? <View style={styles.pageHeaderRight}>{right}</View> : null}
+      </View>
     </View>
   );
 }
@@ -141,6 +150,7 @@ export function GreetingHeader({ onNotifications }: { onNotifications?: () => vo
         <Text style={styles.greetingSmall}>Tuesday, 9 November 2026</Text>
         <Text style={styles.greetingTitle}>Good morning, Anita</Text>
       </View>
+      <LanguagePicker compact />
       <Pressable accessibilityLabel="Notifications" accessibilityRole="button" onPress={onNotifications} style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}>
         <Icon name="bell" size={23} color={surgam.colors.ink} />
         <View style={styles.notificationDot} />

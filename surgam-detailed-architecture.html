@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Surgam Capital - Detailed Enterprise Architecture & Database Specification</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 12mm 10mm 12mm 10mm;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      color: #10211D;
+      background-color: #FFFFFF;
+      line-height: 1.4;
+      font-size: 10px;
+    }
+
+    .page {
+      width: 100%;
+      min-height: 273mm;
+      position: relative;
+      page-break-after: always;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-bottom: 4px;
+    }
+
+    .page:last-child {
+      page-break-after: avoid;
+    }
+
+    /* Header styling */
+    .header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid #147D6B;
+      padding-bottom: 8px;
+      margin-bottom: 10px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand-mark {
+      width: 28px;
+      height: 28px;
+      background: #147D6B;
+      border-radius: 7px;
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-style: italic;
+      font-size: 16px;
+    }
+
+    .brand-text h1 {
+      font-size: 16px;
+      font-weight: 800;
+      color: #10211D;
+      letter-spacing: -0.5px;
+      line-height: 1;
+    }
+
+    .brand-text p {
+      font-size: 8.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: #0E5F52;
+      margin-top: 2px;
+    }
+
+    .meta-badge {
+      text-align: right;
+    }
+
+    .meta-badge .doc-title {
+      font-size: 10px;
+      font-weight: 800;
+      color: #10211D;
+    }
+
+    .meta-badge .doc-sub {
+      font-size: 8px;
+      color: #6D817B;
+      margin-top: 2px;
+    }
+
+    /* Summary card */
+    .summary-card {
+      background: #F6F8F5;
+      border: 1px solid #DCE7E2;
+      border-left: 4px solid #147D6B;
+      border-radius: 8px;
+      padding: 9px 12px;
+      margin-bottom: 12px;
+    }
+
+    .summary-card h2 {
+      font-size: 11px;
+      font-weight: 800;
+      color: #0E5F52;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-card p {
+      color: #48615B;
+      font-size: 9.5px;
+      line-height: 1.45;
+    }
+
+    /* Section title */
+    .section-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: #10211D;
+      margin-bottom: 8px;
+      margin-top: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title::before {
+      content: "";
+      width: 5px;
+      height: 12px;
+      background: #147D6B;
+      border-radius: 2px;
+      display: inline-block;
+    }
+
+    /* 4-App Grid */
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .app-card {
+      border: 1px solid #DCE7E2;
+      border-radius: 8px;
+      padding: 10px;
+      background: #FFFFFF;
+      box-shadow: 0 1px 2px rgba(16, 33, 29, 0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .app-card.card-investor { border-top: 3px solid #147D6B; }
+    .app-card.card-partner  { border-top: 3px solid #2F6BA8; }
+    .app-card.card-ops      { border-top: 3px solid #A66A00; }
+    .app-card.card-admin    { border-top: 3px solid #B94B3F; }
+
+    .app-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+    }
+
+    .app-title {
+      font-size: 10.5px;
+      font-weight: 800;
+      color: #10211D;
+    }
+
+    .pill {
+      font-size: 8px;
+      font-weight: 800;
+      padding: 1.5px 6px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .pill-green { background: #E8F6EF; color: #0E5F52; }
+    .pill-blue  { background: #E7F0FA; color: #2F6BA8; }
+    .pill-amber { background: #FFF3D6; color: #A66A00; }
+    .pill-red   { background: #FDE9E5; color: #B94B3F; }
+
+    .app-users {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #5A6F68;
+      margin-bottom: 5px;
+    }
+
+    .app-points {
+      list-style: none;
+      margin-bottom: 6px;
+    }
+
+    .app-points li {
+      font-size: 8.8px;
+      color: #48615B;
+      margin-bottom: 2px;
+      position: relative;
+      padding-left: 10px;
+      line-height: 1.3;
+    }
+
+    .app-points li::before {
+      content: "•";
+      position: absolute;
+      left: 1px;
+      color: #147D6B;
+      font-weight: 900;
+    }
+
+    .app-isolation {
+      background: #F6F8F5;
+      border-radius: 5px;
+      padding: 5px 7px;
+      font-size: 8px;
+      color: #10211D;
+      font-weight: 600;
+      border-left: 2px solid #5A6F68;
+    }
+
+    /* Diagram containers */
+    .diagram-container {
+      border: 1px solid #DCE7E2;
+      border-radius: 8px;
+      background: #FAFBF9;
+      padding: 10px 12px;
+      margin-bottom: 10px;
+    }
+
+    .diagram-layer {
+      margin-bottom: 8px;
+    }
+
+    .diagram-layer:last-child {
+      margin-bottom: 0;
+    }
+
+    .layer-label {
+      font-size: 8.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #0E5F52;
+      margin-bottom: 4px;
+    }
+
+    .layer-box-row {
+      display: grid;
+      gap: 6px;
+    }
+
+    .grid-4 { grid-template-columns: repeat(4, 1fr); }
+    .grid-3 { grid-template-columns: repeat(3, 1fr); }
+
+    .arch-box {
+      background: #FFFFFF;
+      border: 1px solid #DCE7E2;
+      border-radius: 5px;
+      padding: 6px 8px;
+      box-shadow: 0 1px 2px rgba(16, 33, 29, 0.02);
+    }
+
+    .arch-box-title {
+      font-size: 9px;
+      font-weight: 800;
+      color: #10211D;
+    }
+
+    .arch-box-desc {
+      font-size: 7.8px;
+      color: #6D817B;
+      margin-top: 1.5px;
+      line-height: 1.2;
+    }
+
+    /* Database Table Specifications */
+    .db-module {
+      border: 1px solid #DCE7E2;
+      border-radius: 7px;
+      background: #FFFFFF;
+      margin-bottom: 9px;
+      overflow: hidden;
+    }
+
+    .db-module-header {
+      background: #F6F8F5;
+      padding: 5px 8px;
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #0E5F52;
+      border-bottom: 1px solid #DCE7E2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .db-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 8px;
+    }
+
+    .db-table th {
+      background: #FAFBF9;
+      color: #48615B;
+      font-weight: 700;
+      text-align: left;
+      padding: 4px 6px;
+      border-bottom: 1px solid #EAEFEA;
+    }
+
+    .db-table td {
+      padding: 3.5px 6px;
+      border-bottom: 1px solid #F0F4F2;
+      color: #10211D;
+      vertical-align: top;
+    }
+
+    .pk { font-weight: 800; color: #147D6B; }
+    .fk { color: #2F6BA8; font-weight: 700; }
+    .type { font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace; color: #7B341E; font-size: 7.5px; }
+
+    /* Queries Box */
+    .query-card {
+      background: #FFFBF2;
+      border: 1px solid #F5E1B5;
+      border-left: 4px solid #D97706;
+      border-radius: 7px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+
+    .query-title {
+      font-size: 9.5px;
+      font-weight: 800;
+      color: #B45309;
+      margin-bottom: 3px;
+    }
+
+    .query-desc {
+      font-size: 8.5px;
+      color: #78350F;
+      line-height: 1.35;
+    }
+
+    .query-options {
+      margin-top: 4px;
+      font-size: 8px;
+      color: #92400E;
+    }
+
+    /* Footer */
+    .footer-bar {
+      border-top: 1px solid #DCE7E2;
+      padding-top: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 8px;
+      color: #6D817B;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================================= PAGE 1 ================================= -->
+  <div class="page">
+    <div>
+      <div class="header-bar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-text">
+            <h1>Surgam Capital</h1>
+            <p>Comprehensive Architecture & Database Blueprint</p>
+          </div>
+        </div>
+        <div class="meta-badge">
+          <div class="doc-title">System Specification & Data Dictionary</div>
+          <div class="doc-sub">AWS Multi-AZ & Amazon Aurora Architecture</div>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <h2>Architecture Scope & Regulatory Grounding</h2>
+        <p>
+          This document establishes the production cloud topology, microservice interactions, and relational database schema for Surgam Capital's B2C direct wealth and B2B distributor network platform (AMFI registered MFD). It strictly decouples <strong>four specialized client surfaces</strong>, enforces <strong>cryptographic channel ownership</strong>, and specifies <strong>18 core relational database tables</strong> with row-level security (RLS) under SEBI, AMFI, and DPDP Act frameworks.
+        </p>
+      </div>
+
+      <div class="section-title">The Four Decoupled Application Surfaces</div>
+      <div class="app-grid">
+        <div class="app-card card-investor">
+          <div>
+            <div class="app-card-header">
+              <span class="app-title">1. Investor App & Web</span>
+              <span class="pill pill-green">B2C & B2B Clients</span>
+            </div>
+            <div class="app-users">Users: Direct Investors & Partner Clients</div>
+            <ul class="app-points">
+              <li><strong>Dynamic Co-Branding</strong>: Automatically loads partner logo, ARN, and EUIN for partner clients.</li>
+              <li><strong>Wealth Dashboard</strong>: XIRR, goal-based SIPs, holding breakdown, and capital gains statements.</li>
+              <li><strong>Trade Approval</strong>: In-app, SMS, and WhatsApp OTP authorization with tax-impact previews.</li>
+              <li><strong>Empower Her</strong>: Dedicated female-investor goal spaces and confidential privacy within family accounts.</li>
+            </ul>
+          </div>
+          <div class="app-isolation">
+            <strong>Data Boundary</strong>: Encrypted PAN lookup; scoped strictly to verified family group / investor ID.
+          </div>
+        </div>
+
+        <div class="app-card card-partner">
+          <div>
+            <div class="app-card-header">
+              <span class="app-title">2. Partner Desk (Web & Mobile)</span>
+              <span class="pill pill-blue">Distributor B2B</span>
+            </div>
+            <div class="app-users">Users: Partner Distributors & Sub-Staff</div>
+            <ul class="app-points">
+              <li><strong>Practice Management</strong>: Real-time AUM, net sales, live SIP books, and client 360 views.</li>
+              <li><strong>Assisted Initiation</strong>: Order builder generating secure 24-hour investor approval links.</li>
+              <li><strong>Automated To-Dos</strong>: Proactive alerts for failed SIPs, expiring KYC, and annual reviews.</li>
+              <li><strong>Payout Drill-down</strong>: Full folio-level reconciliation for Model A/B brokerage payouts.</li>
+            </ul>
+          </div>
+          <div class="app-isolation">
+            <strong>Data Boundary</strong>: Database Row-Level Security (RLS) restricts access strictly to mapped sub-ARN folios.
+          </div>
+        </div>
+
+        <div class="app-card card-ops">
+          <div>
+            <div class="app-card-header">
+              <span class="app-title">3. Operations & Compliance Console</span>
+              <span class="pill pill-amber">Back-Office</span>
+            </div>
+            <div class="app-users">Users: Operations Executives, Compliance Officers, Finance</div>
+            <ul class="app-points">
+              <li><strong>Maker-Checker Engine</strong>: Segregated approval queues for overrides, master data, and payouts.</li>
+              <li><strong>Surveillance & AML</strong>: Churn detection (&lt;12m switches) and redemption post-bank change alerts.</li>
+              <li><strong>Feed Reconciliation</strong>: Automated matching of daily CAMS/KFintech feeds against exchange trades.</li>
+              <li><strong>Grievance Helpdesk</strong>: Integrated ticketing with strict 5, 7, and 21-day SEBI escalation timers.</li>
+            </ul>
+          </div>
+          <div class="app-isolation">
+            <strong>Data Boundary</strong>: Internal desktop only; PAN/Bank details masked by default based on role.
+          </div>
+        </div>
+
+        <div class="app-card card-admin">
+          <div>
+            <div class="app-card-header">
+              <span class="app-title">4. Platform Administration</span>
+              <span class="pill pill-red">SecOps & Tech Leads</span>
+            </div>
+            <div class="app-users">Users: CTO, Platform Engineers, SecOps</div>
+            <ul class="app-points">
+              <li><strong>Configuration Engine</strong>: AMC rate cards, commission models, and cut-off schedules.</li>
+              <li><strong>Consent Vault</strong>: Complete DPDP digital consent store, usage purpose, and revocations.</li>
+              <li><strong>8-Year Audit Explorer</strong>: Query access to WORM-compliant immutable ledger for SEBI inspections.</li>
+              <li><strong>Secrets & Key Vault</strong>: AWS KMS key rotation, API rate-limiting, and feature flag management.</li>
+            </ul>
+          </div>
+          <div class="app-isolation">
+            <strong>Data Boundary</strong>: Hardware FIDO2 MFA + IP Whitelist. No direct financial write capabilities.
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Decoupling Guarantees & Channel Integrity</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="background: #F6F8F5; border: 1px solid #DCE7E2; border-radius: 6px; padding: 7px 9px;">
+          <strong style="color: #0E5F52; font-size: 9px;">Channel-Conflict Guard (CMP-07)</strong>
+          <p style="font-size: 8px; color: #48615B; margin-top: 2px;">
+            Surgam Relationship Managers (RMs) are cryptographically restricted from querying or viewing clients tagged to Partner MFDs. Even if an RM searches an investor's PAN, the system returns zero results if tagged to a partner.
+          </p>
+        </div>
+        <div style="background: #F6F8F5; border: 1px solid #DCE7E2; border-radius: 6px; padding: 7px 9px;">
+          <strong style="color: #0E5F52; font-size: 9px;">Hard Suitability Enforcement (CMP-01)</strong>
+          <p style="font-size: 8px; color: #48615B; margin-top: 2px;">
+            Software automatically blocks orders where a fund's Risk-o-meter exceeds the investor's verified risk score. Overrides require dual-authorization and recorded investor acknowledgement before reaching the exchange.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Surgam Capital · Confidential Architecture Blueprint</span>
+      <span>Page 1 of 4 · Surface Isolation</span>
+    </div>
+  </div>
+
+  <!-- ================================= PAGE 2 ================================= -->
+  <div class="page">
+    <div>
+      <div class="header-bar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-text">
+            <h1>Surgam Capital</h1>
+            <p>AWS Cloud Infrastructure Specification</p>
+          </div>
+        </div>
+        <div class="meta-badge">
+          <div class="doc-title">AWS Multi-AZ Cloud Topography</div>
+          <div class="doc-sub">Mumbai (ap-south-1) Primary · Hyderabad (ap-south-2) DR</div>
+        </div>
+      </div>
+
+      <div class="diagram-container">
+        <!-- Layer 1 -->
+        <div class="diagram-layer">
+          <div class="layer-label">1. Edge & Global Ingress Tier (AWS CloudFront & WAF)</div>
+          <div class="layer-box-row grid-3">
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon Route 53</div>
+              <div class="arch-box-desc">Latency-based routing with automated health-check failover to DR</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">AWS WAF & Shield</div>
+              <div class="arch-box-desc">DDoS shielding, OTP endpoint rate limiting & Indian IP geo-fencing</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon CloudFront</div>
+              <div class="arch-box-desc">Low-latency static distribution for Investor, Partner & Ops Apps</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 2 -->
+        <div class="diagram-layer">
+          <div class="layer-label">2. Secure Microservices Cluster (AWS ECS Fargate Multi-AZ)</div>
+          <div class="layer-box-row grid-4">
+            <div class="arch-box">
+              <div class="arch-box-title">Auth & Identity Service</div>
+              <div class="arch-box-desc">Row-Level Security tokens, biometric auth & DPDP store</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Transaction Engine</div>
+              <div class="arch-box-desc">Pre-trade checks, cut-off timers & BSE/NSE routing</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Portfolio & NAV Engine</div>
+              <div class="arch-box-desc">CAMS/KFintech feed parser, XIRR & capital gains</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Compliance Engine</div>
+              <div class="arch-box-desc">Risk-o-meter checks, AML patterns & partner scoring</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 3 -->
+        <div class="diagram-layer">
+          <div class="layer-label">3. Asynchronous Event Mesh & Sagas (Zero Dropped Orders)</div>
+          <div class="layer-box-row grid-3">
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon SQS (FIFO)</div>
+              <div class="arch-box-desc">Strictly ordered, deduplicated queues for order execution</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon EventBridge</div>
+              <div class="arch-box-desc">Domain event bus connecting transactions to notifications</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">AWS Step Functions</div>
+              <div class="arch-box-desc">Resilient state machines for KYC, mandates & payouts</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 4 -->
+        <div class="diagram-layer">
+          <div class="layer-label">4. Regulated Data & Storage Tier (Encryption at Rest with KMS)</div>
+          <div class="layer-box-row grid-4">
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon Aurora MySQL</div>
+              <div class="arch-box-desc">Multi-AZ Serverless v2 with auto-scaling read replicas</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon ElastiCache</div>
+              <div class="arch-box-desc">Redis cluster for session states & distributed order locks</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">S3 Object Lock (WORM)</div>
+              <div class="arch-box-desc">Immutable 8-year regulatory audit log (SEBI compliance)</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Amazon OpenSearch</div>
+              <div class="arch-box-desc">Instant scheme search, Client 360 & operational logs</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer 5 -->
+        <div class="diagram-layer">
+          <div class="layer-label">5. Regulated Indian Financial Rails (Via Multi-AZ Static NAT IPs)</div>
+          <div class="layer-box-row grid-4">
+            <div class="arch-box">
+              <div class="arch-box-title">BSE StAR & NSE NMF II</div>
+              <div class="arch-box-desc">Direct exchange order routing via whitelisted IP tunnels</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">CAMS & KFintech</div>
+              <div class="arch-box-desc">Automated SFTP connectors for daily AUM & brokerage feeds</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">Digio / Signzy / IDfy</div>
+              <div class="arch-box-desc">PAN, KRA verification, Aadhaar eKYC & penny drop</div>
+            </div>
+            <div class="arch-box">
+              <div class="arch-box-title">NPCI AutoPay / e-NACH</div>
+              <div class="arch-box-desc">Automated recurring mandate rails for goal-based SIPs</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-title">Disaster Recovery & High-Availability Mandate (SEC-01)</div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <div style="background: #F6F8F5; border: 1px solid #DCE7E2; border-radius: 6px; padding: 8px 10px;">
+          <strong style="color: #0E5F52; font-size: 9px;">RPO &le; 15 Minutes (Recovery Point Objective)</strong>
+          <p style="font-size: 8px; color: #48615B; margin-top: 2px;">
+            Storage-level cross-region continuous replication via <strong>Amazon Aurora Global Database</strong> to <code>ap-south-2</code> (Hyderabad). Replicates all financial transactions, folios, and mandates with sub-second replication latency.
+          </p>
+        </div>
+        <div style="background: #F6F8F5; border: 1px solid #DCE7E2; border-radius: 6px; padding: 8px 10px;">
+          <strong style="color: #0E5F52; font-size: 9px;">RTO &le; 4 Hours (Recovery Time Objective)</strong>
+          <p style="font-size: 8px; color: #48615B; margin-top: 2px;">
+            Warm-standby <strong>ECS Fargate pilot light cluster</strong> in Hyderabad, capable of full production scale within minutes under automated Route 53 health failover upon primary region disaster declaration.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Surgam Capital · Confidential Architecture Blueprint</span>
+      <span>Page 2 of 4 · Cloud Topography</span>
+    </div>
+  </div>
+
+  <!-- ================================= PAGE 3 ================================= -->
+  <div class="page">
+    <div>
+      <div class="header-bar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-text">
+            <h1>Surgam Capital</h1>
+            <p>Relational Database Model & Table Specifications</p>
+          </div>
+        </div>
+        <div class="meta-badge">
+          <div class="doc-title">Amazon Aurora MySQL Data Dictionary</div>
+          <div class="doc-sub">18 Normalized Production Tables (Part 1)</div>
+        </div>
+      </div>
+
+      <div class="section-title">Core Entities & Relational Schema</div>
+
+      <!-- Module 1: Identity & Profiles -->
+      <div class="db-module">
+        <div class="db-module-header">
+          <span>1. IDENTITY & USER PROFILES (FND-01, FND-02, FND-03)</span>
+          <span style="font-size: 7.5px; color: #6D817B;">users, partner_profiles, investor_profiles, family_groups</span>
+        </div>
+        <table class="db-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Table / Field</th>
+              <th style="width: 18%;">Data Type</th>
+              <th style="width: 15%;">Constraints</th>
+              <th>Description / Regulatory Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pk">users</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Surrogate primary key for global user authentication.</td>
+            </tr>
+            <tr>
+              <td>users.mobile</td>
+              <td class="type">VARCHAR(15)</td>
+              <td>NOT NULL, UNIQUE</td>
+              <td>Primary login identifier; verified via DLT-registered OTP.</td>
+            </tr>
+            <tr>
+              <td>users.role</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>INVESTOR, PARTNER_MFD, PARTNER_STAFF, SURGAM_RM, OPS, COMPLIANCE.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">partner_profiles</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Primary key for partner distributor records.</td>
+            </tr>
+            <tr>
+              <td>partner_profiles.partner_code</td>
+              <td class="type">VARCHAR(32)</td>
+              <td>NOT NULL, UNIQUE</td>
+              <td>Unique code (e.g. PTR_MUM_042) used for channel tagging.</td>
+            </tr>
+            <tr>
+              <td>partner_profiles.arn / euin</td>
+              <td class="type">VARCHAR(32)</td>
+              <td>NOT NULL</td>
+              <td>AMFI ARN registration and EUIN identifiers with expiry checks.</td>
+            </tr>
+            <tr>
+              <td>partner_profiles.model_type</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>MODEL_A (Revenue Share) or MODEL_B (Platform Fee).</td>
+            </tr>
+            <tr>
+              <td><span class="pk">investor_profiles</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Investor master entity.</td>
+            </tr>
+            <tr>
+              <td>investor_profiles.channel_tag</td>
+              <td class="type">VARCHAR(64)</td>
+              <td>NOT NULL, INDEX</td>
+              <td><strong>RLS Guard</strong>: "SURGAM_DIRECT" or partner_code. Immutable without signed consent.</td>
+            </tr>
+            <tr>
+              <td>investor_profiles.partner_id</td>
+              <td class="type">INT</td>
+              <td><span class="fk">FK &rarr; partner_profiles</span></td>
+              <td>Mapped partner for B2B client relationship. NULL for direct clients.</td>
+            </tr>
+            <tr>
+              <td>investor_profiles.pan_masked</td>
+              <td class="type">VARCHAR(16)</td>
+              <td>NOT NULL</td>
+              <td>Masked display (ABCDE****F); full encrypted PAN in separate KMS column.</td>
+            </tr>
+            <tr>
+              <td>investor_profiles.kra_status</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>VALIDATED, REGISTERED, ON_HOLD, REJECTED (KYC routine).</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Module 2: Compliance, KYC & Consent -->
+      <div class="db-module">
+        <div class="db-module-header">
+          <span>2. COMPLIANCE, VERIFICATION & DPDP (ONB-04, ONB-08, FND-06, CMP-01)</span>
+          <span style="font-size: 7.5px; color: #6D817B;">bank_accounts, nominees, risk_profiles, dpdp_consent_store</span>
+        </div>
+        <table class="db-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Table / Field</th>
+              <th style="width: 18%;">Data Type</th>
+              <th style="width: 15%;">Constraints</th>
+              <th>Description / Regulatory Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pk">bank_accounts</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Bank account records linked to investors.</td>
+            </tr>
+            <tr>
+              <td>bank_accounts.investor_id</td>
+              <td class="type">INT</td>
+              <td><span class="fk">FK &rarr; investor_profiles</span></td>
+              <td>Owner of the bank account. Third-party payments blocked by rule.</td>
+            </tr>
+            <tr>
+              <td>bank_accounts.penny_drop_status</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>PENDING, VERIFIED, MISMATCH. Name match score recorded.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">risk_profiles</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Suitability questionnaire results.</td>
+            </tr>
+            <tr>
+              <td>risk_profiles.score / tier</td>
+              <td class="type">INT / ENUM</td>
+              <td>NOT NULL</td>
+              <td>1-99 Risk Number; CONSERVATIVE, MODERATE, GROWTH, AGGRESSIVE.</td>
+            </tr>
+            <tr>
+              <td>risk_profiles.expires_at</td>
+              <td class="type">TIMESTAMP</td>
+              <td>NOT NULL, INDEX</td>
+              <td><strong>Annual Expiry</strong>: Hard-blocks orders if profile &gt; 12 months old.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">dpdp_consent_store</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>DPDP Act compliant digital consent store.</td>
+            </tr>
+            <tr>
+              <td>dpdp_consent_store.purpose</td>
+              <td class="type">VARCHAR(128)</td>
+              <td>NOT NULL</td>
+              <td>Specific purpose: PORTFOLIO_ANALYSIS, WHATSAPP_COMMS, AA_FETCH.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Module 3: Schemes & Market Data -->
+      <div class="db-module">
+        <div class="db-module-header">
+          <span>3. MASTER SCHEME & MARKET DATA (TXN-01, HLD-02)</span>
+          <span style="font-size: 7.5px; color: #6D817B;">amcs, schemes, nav_history</span>
+        </div>
+        <table class="db-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Table / Field</th>
+              <th style="width: 18%;">Data Type</th>
+              <th style="width: 15%;">Constraints</th>
+              <th>Description / Regulatory Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pk">schemes</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Master scheme database.</td>
+            </tr>
+            <tr>
+              <td>schemes.amfi_code / isin</td>
+              <td class="type">VARCHAR(32)</td>
+              <td>NOT NULL, UNIQUE</td>
+              <td>Exchange trade identifiers for BSE StAR MF and NSE NMF II.</td>
+            </tr>
+            <tr>
+              <td>schemes.plan_type</td>
+              <td class="type">ENUM</td>
+              <td>DEFAULT 'REGULAR'</td>
+              <td>Regulatory rule: Distributes REGULAR plans only. Direct plans excluded.</td>
+            </tr>
+            <tr>
+              <td>schemes.riskometer_level</td>
+              <td class="type">INT</td>
+              <td>NOT NULL (1 to 6)</td>
+              <td>1-Low, 2-Low to Mod, 3-Mod, 4-Mod High, 5-High, 6-Very High.</td>
+            </tr>
+            <tr>
+              <td>schemes.cutoff_time</td>
+              <td class="type">VARCHAR(8)</td>
+              <td>NOT NULL</td>
+              <td>14:00 (Equity/Debt) or 12:30 (Liquid/Overnight) cut-off timestamps.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">nav_history</span>.nav_value</td>
+              <td class="type">DECIMAL(12,4)</td>
+              <td>NOT NULL</td>
+              <td>Daily scheme Net Asset Value imported from AMFI/RTA feeds.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Surgam Capital · Confidential Architecture Blueprint</span>
+      <span>Page 3 of 4 · Database Schema (Part 1)</span>
+    </div>
+  </div>
+
+  <!-- ================================= PAGE 4 ================================= -->
+  <div class="page">
+    <div>
+      <div class="header-bar">
+        <div class="brand">
+          <div class="brand-mark">S</div>
+          <div class="brand-text">
+            <h1>Surgam Capital</h1>
+            <p>Database Model (Part 2) & Open Decisions</p>
+          </div>
+        </div>
+        <div class="meta-badge">
+          <div class="doc-title">Orders, Payouts & Open Queries</div>
+          <div class="doc-sub">Data Dictionary (Part 2) & Architectural Governance</div>
+        </div>
+      </div>
+
+      <div class="section-title">Transactions, Plans, Payouts & Audit Schema</div>
+
+      <!-- Module 4 & 5: Orders, Plans, Payouts -->
+      <div class="db-module">
+        <div class="db-module-header">
+          <span>4. ORDERS, MANDATES & PLANS (TXN-02..06, HLD-01..03)</span>
+          <span style="font-size: 7.5px; color: #6D817B;">folios, holdings, orders, mandates, recurring_plans</span>
+        </div>
+        <table class="db-table">
+          <thead>
+            <tr>
+              <th style="width: 22%;">Table / Field</th>
+              <th style="width: 18%;">Data Type</th>
+              <th style="width: 15%;">Constraints</th>
+              <th>Description / Regulatory Purpose</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="pk">folios</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Folio master record per investor and AMC.</td>
+            </tr>
+            <tr>
+              <td>folios.partner_id</td>
+              <td class="type">INT</td>
+              <td><span class="fk">FK &rarr; partner_profiles</span></td>
+              <td>Sub-distributor mapping; enforces trailing brokerage attribution.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">orders</span>.id</td>
+              <td class="type">INT</td>
+              <td>PK, Auto-Inc</td>
+              <td>Financial order entity.</td>
+            </tr>
+            <tr>
+              <td>orders.order_type</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>PURCHASE, SIP, REDEMPTION, SWITCH, STP, SWP.</td>
+            </tr>
+            <tr>
+              <td>orders.approval_status</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL, INDEX</td>
+              <td><strong>TXN-04 Guard</strong>: PENDING_APPROVAL, APPROVED, REJECTED, EXPIRED.</td>
+            </tr>
+            <tr>
+              <td>orders.suitability_status</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>PASSED, OVERRIDDEN_WITH_CONSENT, BLOCKED (hard suitability flag).</td>
+            </tr>
+            <tr>
+              <td>orders.exchange_status</td>
+              <td class="type">ENUM</td>
+              <td>NOT NULL</td>
+              <td>QUEUED, SUBMITTED, ACCEPTED, ALLOTTED, REJECTED.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">mandates</span>.umrn</td>
+              <td class="type">VARCHAR(64)</td>
+              <td>INDEX</td>
+              <td>NPCI Unique Mandate Reference Number for UPI AutoPay / e-NACH.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">recurring_plans</span>.next_run_date</td>
+              <td class="type">TIMESTAMP</td>
+              <td>NOT NULL, INDEX</td>
+              <td>Target execution date for automated SIP/STP/SWP cycles.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">partner_payout_statements</span></td>
+              <td class="type">DECIMAL(14,2)</td>
+              <td>NOT NULL</td>
+              <td>Tracks gross brokerage, Model A/B split, TDS, GST, and net disbursed.</td>
+            </tr>
+            <tr>
+              <td><span class="pk">immutable_audit_logs</span></td>
+              <td class="type">VARCHAR(128)</td>
+              <td>NOT NULL, INDEX</td>
+              <td>SHA-256 cryptographic state hash of every view, change & order.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="section-title">Open Architectural & Strategic Queries</div>
+      <p style="font-size: 8px; color: #5A6F68; margin-bottom: 6px;">
+        The following architectural and operational decision points are kept open for executive and stakeholder resolution:
+      </p>
+
+      <!-- Query 1 -->
+      <div class="query-card">
+        <div class="query-title">Query 1: Transaction Rail Integration Model (Direct vs Managed API Layer)</div>
+        <div class="query-desc">
+          <strong>Decision Point</strong>: Integrate directly with BSE StAR MF / NSE NMF II (exchange membership via Surgam's ARN) vs buy a unified transaction API layer (such as Fintech Primitives by Cybrilla or smallcase Gateway).
+        </div>
+        <div class="query-options">
+          &bull; <em>Direct Exchange Integration</em>: Zero per-transaction API markups; higher upfront integration effort and ongoing exchange schema maintenance.<br>
+          &bull; <em>API Layer</em>: Reduces launch effort by ~5 person-weeks; adds per-transaction recurring vendor fees.
+        </div>
+      </div>
+
+      <!-- Query 2 -->
+      <div class="query-card">
+        <div class="query-title">Query 2: Feed Ingestion & Portfolio Valuation Engine (Build vs Buy API)</div>
+        <div class="query-desc">
+          <strong>Decision Point</strong>: Parse daily CAMS and KFintech SFTP feeds and calculate XIRR/capital gains in-house vs utilize mature back-office calculation APIs (e.g., Investwell or REDVision Wealth Elite).
+        </div>
+        <div class="query-options">
+          &bull; <em>In-House Engine</em>: Full control over calculation nuances and complete data sovereignty without external export dependencies.<br>
+          &bull; <em>Back-Office Vendor API</em>: Pre-built handling of edge cases (corporate actions, mergers), saving ~5 person-weeks.
+        </div>
+      </div>
+
+      <!-- Query 3 -->
+      <div class="query-card">
+        <div class="query-title">Query 3: Suitability Enforcement Thresholds (Hard Block vs Recorded Consent)</div>
+        <div class="query-desc">
+          <strong>Decision Point</strong>: Determine whether orders where fund Risk-o-meter exceeds investor risk level should be completely blocked by software, or permitted for non-vulnerable investors if accompanied by explicit, recorded digital consent.
+        </div>
+        <div class="query-options">
+          &bull; <em>Recommended Hybrid</em>: Hard block for vulnerable investors (age &gt; 60, declared distress); recorded consent + compliance review queue for standard investors.
+        </div>
+      </div>
+
+      <!-- Query 4 -->
+      <div class="query-card">
+        <div class="query-title">Query 4: AI LLM Boundary (Bedrock Claude vs Local Indic Models)</div>
+        <div class="query-desc">
+          <strong>Decision Point</strong>: Run conversational support and review pack generation via Amazon Bedrock (Claude 3.5 Sonnet) vs deploy dedicated Indian open models (e.g. Sarvam AI) within VPC subnets for vernacular Hindi/Marathi processing.
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bar">
+      <span>Surgam Capital · Confidential Architecture Blueprint</span>
+      <span>Page 4 of 4 · Database Schema & Open Queries</span>
+    </div>
+  </div>
+
+</body>
+</html>

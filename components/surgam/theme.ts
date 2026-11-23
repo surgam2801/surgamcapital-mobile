@@ -2,17 +2,18 @@ import { Platform } from "react-native";
 
 export const surgam = {
   colors: {
-    ink: "#10211D",
-    inkSoft: "#48615B",
-    muted: "#6D817B",
-    canvas: "#F6F8F5",
+    // Greens shifted ~12° toward blue (2026-11 rebuild); other roles unchanged.
+    ink: "#10201F",
+    inkSoft: "#485F5E",
+    muted: "#6D807F",
+    canvas: "#F5F8F7",
     surface: "#FFFFFF",
-    surfaceTint: "#EAF5F0",
-    border: "#DCE7E2",
-    evergreen: "#147D6B",
-    evergreenDark: "#0E5F52",
-    mint: "#BFE9D6",
-    mintSoft: "#E8F6EF",
+    surfaceTint: "#EAF4F3",
+    border: "#DCE6E5",
+    evergreen: "#14787D",
+    evergreenDark: "#0E5A5F",
+    mint: "#BFE7E2",
+    mintSoft: "#E8F5F3",
     blueSoft: "#E7F0FA",
     blue: "#2F6BA8",
     amberSoft: "#FFF3D6",
@@ -37,7 +38,7 @@ export const surgam = {
   shadow: Platform.select({
     web: { boxShadow: "0px 10px 30px rgba(16, 33, 29, 0.06)" },
     default: {
-      shadowColor: "#10211D",
+      shadowColor: "#10201F",
       shadowOffset: { width: 0, height: 8 },
       shadowOpacity: 0.06,
       shadowRadius: 18,

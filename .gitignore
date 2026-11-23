@@ -65,6 +65,9 @@ Thumbs.db
 *.apk
 .cache/
 
+# Local API data (AMFI cache, dev store, dev JWT secret)
+.data/
+
 # Manus/webdev artifacts
 .manus-starter-init.json
 .webdev/

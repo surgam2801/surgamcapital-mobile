@@ -53,10 +53,10 @@ export function SurgamMark({ compact = false }: { compact?: boolean }) {
 }
 
 const navItems: { label: string; icon: SurgamIconName; path: string }[] = [
-  { label: "Overview", icon: "home", path: "/(tabs)" },
-  { label: "Investments", icon: "investments", path: "/(tabs)/investments" },
-  { label: "Money plans", icon: "plans", path: "/(tabs)/plans" },
-  { label: "Help & profile", icon: "help", path: "/(tabs)/help" },
+  { label: "Overview", icon: "home", path: "/dashboard" },
+  { label: "Investments", icon: "investments", path: "/dashboard/investments" },
+  { label: "Money plans", icon: "plans", path: "/dashboard/plans" },
+  { label: "Help & profile", icon: "help", path: "/dashboard/help" },
 ];
 
 export function DesktopRail() {
@@ -67,11 +67,13 @@ export function DesktopRail() {
 
   return (
     <View style={styles.rail}>
-      <SurgamMark />
+      <Pressable accessibilityRole="link" accessibilityLabel="Surgam home" onPress={() => router.push("/" as never)}>
+        <SurgamMark />
+      </Pressable>
       <Text style={styles.railKicker}>YOUR MONEY, SIMPLIFIED</Text>
       <View style={styles.railNav}>
         {navItems.map((item) => {
-          const selected = item.path === "/(tabs)" ? pathname === "/" || pathname === "/(tabs)" : pathname.includes(item.path.split("/").pop() ?? "");
+          const selected = item.path === "/dashboard" ? pathname === "/dashboard" : pathname.includes(item.path.split("/").pop() ?? "");
           return (
             <Pressable
               key={item.label}

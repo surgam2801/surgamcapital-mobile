@@ -8,6 +8,7 @@ import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { createCorsMiddleware } from "./cors";
 import { clearLegacySessionCookie } from "./cookies";
+import { ensureLoaded } from "../mf/amfi";
 
 async function startServer() {
   const app = express();
@@ -36,7 +37,9 @@ async function startServer() {
 
   const port = parseInt(process.env.PORT || "3000");
   server.listen(port, () => {
-    console.log("[api] server listening");
+    console.log(`[api] server listening on ${port}`);
+    // Warm the mutual fund scheme master so the first page load is fast.
+    void ensureLoaded();
   });
 }
 

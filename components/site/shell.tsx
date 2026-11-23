@@ -50,7 +50,11 @@ function Dropdown({ group, onGo, onClose }: { group: NavGroup; onGo: (href: stri
   const isProducts = group.label === "Products";
   return (
     <View pointerEvents="box-none" style={s.dropWrap}>
-      <Pressable accessible={false} onHoverOut={onClose} style={[s.drop, isProducts ? { width: 560 } : { width: 620 }]}>
+      {/* Transparent backdrop below the menu: moving onto the page or clicking it closes the menu.
+          (Closing on the menu's own hover-out fired when the pointer moved onto a child item,
+          which unmounted the item before the click landed.) */}
+      <Pressable accessible={false} onHoverIn={onClose} onPress={onClose} style={s.backdrop} />
+      <View style={[s.drop, isProducts ? { width: 560 } : { width: 620 }]}>
         {isProducts ? (
           <View style={{ flexDirection: "row", gap: 24 }}>
             <Pressable accessibilityRole="link" onPress={() => onGo("/mutual-funds")} style={({ hovered }: { hovered?: boolean }) => [s.dropFeature, hovered && { backgroundColor: c.surfaceTint }]}>
@@ -77,7 +81,7 @@ function Dropdown({ group, onGo, onClose }: { group: NavGroup; onGo: (href: stri
             ))}
           </View>
         )}
-      </Pressable>
+      </View>
     </View>
   );
 }
@@ -235,6 +239,7 @@ const s = StyleSheet.create({
   accountText: { fontFamily: F, color: c.white, fontSize: 14, fontWeight: "600" },
   menuBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 8 },
   dropWrap: { position: "absolute", top: 64, left: 0, right: 0, alignItems: "center", zIndex: 30 },
+  backdrop: { position: "absolute", top: 0, left: 0, right: 0, height: 4000, backgroundColor: "transparent" },
   drop: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.border, borderRadius: 12, padding: 12, shadowColor: c.navy, shadowOpacity: 0.1, shadowRadius: 24, shadowOffset: { width: 0, height: 12 } },
   dropFeature: { width: 220, padding: 16, borderRadius: 8, backgroundColor: c.canvas, gap: 6 },
   dropHead: { fontFamily: F, color: c.muted, fontSize: 11, fontWeight: "600", letterSpacing: 1, textTransform: "uppercase", paddingHorizontal: 10, paddingVertical: 6 },

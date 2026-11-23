@@ -4,14 +4,14 @@ import { Text, View } from "react-native";
 import { formatINR, fvSip, fvStepUpSip, planGoal, planRetirement } from "@/shared/mf/calc";
 import type { CalculatorDef } from "@/shared/mf/content";
 import { Bars } from "./chart";
-import { Button, c, Card, NumberField, Pill, styles as t, useBreakpoint } from "./ui";
+import { Button, c, Card, F, NumberField, Pill, styles as t, useBreakpoint } from "./ui";
 
 function Result({ rows, headline, headlineLabel, note }: { rows: { label: string; value: string }[]; headline: string; headlineLabel: string; note?: string }) {
   return (
     <View style={{ gap: 14 }}>
-      <View style={{ backgroundColor: c.evergreenDark, borderRadius: 18, padding: 20, gap: 4 }}>
-        <Text style={{ color: c.mint, fontSize: 13, fontWeight: "800" }}>{headlineLabel}</Text>
-        <Text style={{ color: c.white, fontSize: 30, fontWeight: "900" }}>{headline}</Text>
+      <View style={{ backgroundColor: c.navy, borderRadius: 10, padding: 20, gap: 6 }}>
+        <Text style={{ fontFamily: F, color: "#9FB0BB", fontSize: 13, fontWeight: "500" }}>{headlineLabel}</Text>
+        <Text style={{ fontFamily: F, color: c.white, fontSize: 32, fontWeight: "600", letterSpacing: -0.8, fontVariant: ["tabular-nums"] }}>{headline}</Text>
       </View>
       {rows.map((r) => (
         <View key={r.label} style={{ flexDirection: "row", justifyContent: "space-between", gap: 12, borderBottomWidth: 1, borderBottomColor: c.border, paddingBottom: 10 }}>
@@ -128,7 +128,7 @@ export function Calculator({ def }: { def: CalculatorDef }) {
       <Card style={{ ...(isDesktop ? { flex: 1 } : { width: "100%" }), height: undefined, gap: 16 }}>{fields}</Card>
       <Card style={{ ...(isDesktop ? { flex: 1 } : { width: "100%" }), height: undefined, gap: 16 }}>
         {result}
-        <Text style={[t.body, { fontWeight: "700", color: c.evergreenDark }]}>{def.prompt}</Text>
+        <Text style={[t.body, { fontWeight: "500", color: c.ink }]}>{def.prompt}</Text>
         <View style={{ flexDirection: "row", gap: 10, flexWrap: "wrap" }}>
           <Button label="Start a SIP" icon="arrow-forward" href="/mutual-funds/sip" />
           <Button label="Save as a goal" variant="secondary" onPress={() => router.push("/explore/goal-planning" as never)} />

@@ -3,6 +3,9 @@ import { useRouter } from "expo-router";
 import type { ReactNode } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, useWindowDimensions, View, type StyleProp, type ViewStyle } from "react-native";
 import { surgam } from "@/components/surgam/theme";
+import { F } from "./fonts";
+
+export { F };
 
 export const c = surgam.colors;
 export const MAX_W = 1160;
@@ -26,13 +29,13 @@ export function Container({ children, style }: { children: ReactNode; style?: St
 export function Section({ kicker, title, subtitle, children, tint = false, action }: { kicker?: string; title?: string; subtitle?: string; children?: ReactNode; tint?: boolean; action?: ReactNode }) {
   const { isPhone } = useBreakpoint();
   return (
-    <View style={[{ paddingVertical: isPhone ? 32 : 56 }, tint && { backgroundColor: c.surfaceTint }]}>
+    <View style={[{ paddingVertical: isPhone ? 40 : 72 }, tint && { backgroundColor: c.surface, borderTopWidth: 1, borderBottomWidth: 1, borderColor: c.border }]}>
       <Container>
         {(title || kicker) && (
           <View style={[styles.sectionHead, isPhone && { flexDirection: "column", alignItems: "flex-start" }]}>
             <View style={{ flex: 1, gap: 6 }}>
               {kicker ? <Text style={styles.kicker}>{kicker}</Text> : null}
-              {title ? <Text style={[styles.h2, isPhone && { fontSize: 24 }]} accessibilityRole="header">{title}</Text> : null}
+              {title ? <Text style={[styles.h2, isPhone && { fontSize: 24, lineHeight: 31 }]} accessibilityRole="header">{title}</Text> : null}
               {subtitle ? <Text style={styles.lead}>{subtitle}</Text> : null}
             </View>
             {action}
@@ -70,11 +73,11 @@ export function Card({ children, onPress, style, accessibilityLabel }: { childre
 }
 
 export function IconTile({ icon, tone = "teal" }: { icon: string; tone?: "teal" | "blue" | "amber" | "coral" }) {
-  const map = { teal: [c.mintSoft, c.evergreen], blue: [c.blueSoft, c.blue], amber: [c.amberSoft, c.amber], coral: [c.coralSoft, c.coral] } as const;
-  const [bg, fg] = map[tone];
+  // Quiet, single-colour icon mark; tone kept for API compatibility but intentionally restrained.
+  const fg = tone === "coral" ? c.coral : c.evergreen;
   return (
-    <View style={[styles.iconTile, { backgroundColor: bg }]}>
-      <Icon name={icon} size={22} color={fg} />
+    <View style={styles.iconTile}>
+      <Icon name={icon} size={20} color={fg} />
     </View>
   );
 }
@@ -83,10 +86,10 @@ export function Button({ label, onPress, href, variant = "primary", icon, disabl
   const router = useRouter();
   const v = {
     primary: { bg: c.evergreen, fg: c.white, border: c.evergreen },
-    secondary: { bg: c.surface, fg: c.evergreenDark, border: c.border },
+    secondary: { bg: c.surface, fg: c.ink, border: c.border },
     ghost: { bg: "transparent", fg: c.evergreen, border: "transparent" },
-    light: { bg: c.white, fg: c.evergreenDark, border: c.white },
-    outlineLight: { bg: "transparent", fg: c.white, border: "rgba(255,255,255,0.55)" },
+    light: { bg: c.white, fg: c.navy, border: c.white },
+    outlineLight: { bg: "transparent", fg: c.white, border: "rgba(255,255,255,0.35)" },
   }[variant];
   return (
     <Pressable
@@ -174,7 +177,7 @@ export function Stat({ label, value, tone }: { label: string; value: string; ton
   return (
     <View style={{ gap: 4 }}>
       <Text style={styles.statLabel}>{label}</Text>
-      <Text style={[styles.statValue, tone === "pos" && { color: c.evergreen }, tone === "neg" && { color: c.coral }]}>{value}</Text>
+      <Text style={[styles.statValue, tone === "pos" && { color: c.gain }, tone === "neg" && { color: c.loss }]}>{value}</Text>
     </View>
   );
 }
@@ -203,34 +206,34 @@ export function EmptyState({ title, body }: { title: string; body?: string }) {
 }
 
 export const styles = StyleSheet.create({
-  sectionHead: { flexDirection: "row", alignItems: "flex-end", gap: 16, marginBottom: 24 },
-  kicker: { color: c.evergreen, fontSize: 12, fontWeight: "800", letterSpacing: 1.4, textTransform: "uppercase" },
-  h1: { color: c.ink, fontSize: 48, lineHeight: 56, fontWeight: "900", letterSpacing: -1 },
-  h2: { color: c.ink, fontSize: 32, lineHeight: 40, fontWeight: "900", letterSpacing: -0.5 },
-  h3: { color: c.ink, fontSize: 20, lineHeight: 26, fontWeight: "800" },
-  h4: { color: c.ink, fontSize: 16, lineHeight: 22, fontWeight: "800" },
-  lead: { color: c.inkSoft, fontSize: 17, lineHeight: 26, maxWidth: 720 },
-  body: { color: c.inkSoft, fontSize: 15, lineHeight: 23 },
-  small: { color: c.muted, fontSize: 13, lineHeight: 19 },
-  card: { backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.border, padding: 20, gap: 10, flexGrow: 1 },
-  cardHover: { borderColor: c.evergreen, transform: [{ translateY: -2 }] },
-  iconTile: { width: 44, height: 44, borderRadius: 14, alignItems: "center", justifyContent: "center" },
-  btn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 12, paddingHorizontal: 18, borderRadius: 14, borderWidth: 1, minHeight: 46, alignSelf: "flex-start" },
-  btnText: { fontSize: 15, fontWeight: "800" },
-  pill: { paddingHorizontal: 14, paddingVertical: 9, borderRadius: 999, borderWidth: 1, borderColor: c.border, backgroundColor: c.surface },
-  pillActive: { backgroundColor: c.evergreen, borderColor: c.evergreen },
-  pillText: { color: c.inkSoft, fontSize: 13, fontWeight: "700" },
-  tag: { alignSelf: "flex-start", borderRadius: 999, paddingHorizontal: 10, paddingVertical: 4 },
-  tagText: { fontSize: 12, fontWeight: "800" },
-  label: { color: c.inkSoft, fontSize: 13, fontWeight: "800" },
-  inputRow: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: c.border, borderRadius: 14, backgroundColor: c.surface, minHeight: 48, paddingHorizontal: 6 },
-  inputText: { paddingHorizontal: 14, color: c.ink, fontSize: 16, fontWeight: "700" },
-  input: { flex: 1, minWidth: 40, color: c.ink, fontSize: 16, fontWeight: "800", paddingVertical: 10, paddingHorizontal: 4, textAlign: "center" },
-  affix: { color: c.muted, fontSize: 15, fontWeight: "700" },
-  stepBtn: { width: 36, height: 36, borderRadius: 10, alignItems: "center", justifyContent: "center", backgroundColor: c.mintSoft },
-  hint: { color: c.muted, fontSize: 12 },
-  statLabel: { color: c.muted, fontSize: 12, fontWeight: "700" },
-  statValue: { color: c.ink, fontSize: 20, fontWeight: "900" },
-  notice: { flexDirection: "row", gap: 8, alignItems: "flex-start", borderRadius: 14, padding: 12 },
-  noticeText: { flex: 1, fontSize: 13, lineHeight: 19, fontWeight: "600" },
+  sectionHead: { flexDirection: "row", alignItems: "flex-end", gap: 16, marginBottom: 32 },
+  kicker: { fontFamily: F, color: c.muted, fontSize: 12, fontWeight: "600", letterSpacing: 1.2, textTransform: "uppercase" },
+  h1: { fontFamily: F, color: c.ink, fontSize: 46, lineHeight: 54, fontWeight: "600", letterSpacing: -1.2 },
+  h2: { fontFamily: F, color: c.ink, fontSize: 30, lineHeight: 38, fontWeight: "600", letterSpacing: -0.6 },
+  h3: { fontFamily: F, color: c.ink, fontSize: 18, lineHeight: 26, fontWeight: "600", letterSpacing: -0.2 },
+  h4: { fontFamily: F, color: c.ink, fontSize: 15, lineHeight: 22, fontWeight: "600" },
+  lead: { fontFamily: F, color: c.inkSoft, fontSize: 17, lineHeight: 27, maxWidth: 680 },
+  body: { fontFamily: F, color: c.inkSoft, fontSize: 15, lineHeight: 24 },
+  small: { fontFamily: F, color: c.muted, fontSize: 13, lineHeight: 20 },
+  card: { backgroundColor: c.surface, borderRadius: 12, borderWidth: 1, borderColor: c.border, padding: 24, gap: 10, flexGrow: 1 },
+  cardHover: { borderColor: "#C5CFD7", transform: [{ translateY: -2 }], shadowColor: c.navy, shadowOpacity: 0.06, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } },
+  iconTile: { width: 40, height: 40, borderRadius: 8, borderWidth: 1, borderColor: c.border, backgroundColor: c.surface, alignItems: "center", justifyContent: "center" },
+  btn: { flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 8, paddingVertical: 11, paddingHorizontal: 18, borderRadius: 8, borderWidth: 1, minHeight: 44, alignSelf: "flex-start" },
+  btnText: { fontFamily: F, fontSize: 15, fontWeight: "600" },
+  pill: { paddingHorizontal: 12, paddingVertical: 7, borderRadius: 8, borderWidth: 1, borderColor: c.border, backgroundColor: c.surface },
+  pillActive: { backgroundColor: c.ink, borderColor: c.ink },
+  pillText: { fontFamily: F, color: c.inkSoft, fontSize: 13, fontWeight: "500" },
+  tag: { alignSelf: "flex-start", borderRadius: 4, paddingHorizontal: 8, paddingVertical: 3 },
+  tagText: { fontFamily: F, fontSize: 12, fontWeight: "500" },
+  label: { fontFamily: F, color: c.inkSoft, fontSize: 13, fontWeight: "500" },
+  inputRow: { flexDirection: "row", alignItems: "center", borderWidth: 1, borderColor: c.border, borderRadius: 8, backgroundColor: c.surface, minHeight: 46, paddingHorizontal: 4 },
+  inputText: { fontFamily: F, paddingHorizontal: 12, color: c.ink, fontSize: 15, fontWeight: "500" },
+  input: { fontFamily: F, flex: 1, minWidth: 40, color: c.ink, fontSize: 15, fontWeight: "600", paddingVertical: 10, paddingHorizontal: 4, textAlign: "center", fontVariant: ["tabular-nums"] },
+  affix: { fontFamily: F, color: c.muted, fontSize: 14, fontWeight: "500" },
+  stepBtn: { width: 34, height: 34, borderRadius: 6, alignItems: "center", justifyContent: "center", backgroundColor: c.surfaceTint },
+  hint: { fontFamily: F, color: c.muted, fontSize: 12 },
+  statLabel: { fontFamily: F, color: c.muted, fontSize: 12, fontWeight: "500" },
+  statValue: { fontFamily: F, color: c.ink, fontSize: 20, fontWeight: "600", fontVariant: ["tabular-nums"], letterSpacing: -0.3 },
+  notice: { flexDirection: "row", gap: 8, alignItems: "flex-start", borderRadius: 8, padding: 12 },
+  noticeText: { fontFamily: F, flex: 1, fontSize: 13, lineHeight: 19, fontWeight: "500" },
 });

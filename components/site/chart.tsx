@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Text, View, type LayoutChangeEvent } from "react-native";
 import Svg, { Defs, LinearGradient, Line, Path, Stop } from "react-native-svg";
 import type { NavPoint } from "@/shared/mf/types";
-import { c } from "./ui";
+import { c, F } from "./ui";
 
 export function NavChart({ points, height = 220 }: { points: NavPoint[]; height?: number }) {
   const [width, setWidth] = useState(0);
@@ -25,7 +25,7 @@ export function NavChart({ points, height = 220 }: { points: NavPoint[]; height?
   const line = points.map((p, i) => `${i === 0 ? "M" : "L"}${x(i).toFixed(1)},${y(p.nav).toFixed(1)}`).join(" ");
   const area = `${line} L${width},${height} L0,${height} Z`;
   const up = values[values.length - 1] >= values[0];
-  const stroke = up ? c.evergreen : c.coral;
+  const stroke = up ? c.evergreen : c.loss;
   return (
     <View onLayout={onLayout} style={{ height }} accessibilityLabel={`NAV chart from ${points[0].date} to ${points[points.length - 1].date}, ${up ? "up" : "down"} ${(((values[values.length - 1] - values[0]) / values[0]) * 100).toFixed(1)} percent`}>
       {width > 0 ? (
@@ -55,11 +55,11 @@ export function Bars({ rows, format = (v: number) => String(v) }: { rows: { labe
       {rows.map((r) => (
         <View key={r.label} style={{ gap: 4 }}>
           <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
-            <Text style={{ color: c.ink, fontSize: 14, fontWeight: "700", flex: 1 }} numberOfLines={1}>{r.label}</Text>
-            <Text style={{ color: c.inkSoft, fontSize: 14, fontWeight: "800" }}>{format(r.value)}</Text>
+            <Text style={{ fontFamily: F, color: c.ink, fontSize: 14, fontWeight: "500", flex: 1 }} numberOfLines={1}>{r.label}</Text>
+            <Text style={{ fontFamily: F, color: c.inkSoft, fontSize: 14, fontWeight: "600", fontVariant: ["tabular-nums"] }}>{format(r.value)}</Text>
           </View>
-          <View style={{ height: 10, borderRadius: 6, backgroundColor: c.mintSoft, overflow: "hidden" }}>
-            <View style={{ width: `${(Math.abs(r.value) / max) * 100}%`, height: "100%", backgroundColor: r.value < 0 ? c.coral : c.evergreen, borderRadius: 6 }} />
+          <View style={{ height: 6, borderRadius: 3, backgroundColor: c.surfaceTint, overflow: "hidden" }}>
+            <View style={{ width: `${(Math.abs(r.value) / max) * 100}%`, height: "100%", backgroundColor: r.value < 0 ? c.loss : c.evergreen, borderRadius: 3 }} />
           </View>
         </View>
       ))}

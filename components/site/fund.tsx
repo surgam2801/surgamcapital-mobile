@@ -2,15 +2,15 @@ import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { formatPct } from "@/shared/mf/calc";
 import type { SchemeWithReturns } from "@/shared/mf/types";
-import { c, Card, EmptyState, Icon, Notice, Skeleton, Tag, useBreakpoint } from "./ui";
+import { c, Card, EmptyState, F, Icon, Notice, Skeleton, Tag, useBreakpoint } from "./ui";
 
-const toneFor = (cat: string) => (cat === "Equity" ? "teal" : cat === "Debt" ? "blue" : cat === "Hybrid" ? "amber" : "neutral") as "teal" | "blue" | "amber" | "neutral";
+const toneFor = (_cat: string) => "neutral" as const;
 
 function Ret({ label, v }: { label: string; v: number | null | undefined }) {
   return (
     <View style={{ alignItems: "flex-end", minWidth: 64 }}>
       <Text style={s.retLabel}>{label}</Text>
-      <Text style={[s.retValue, v != null && v < 0 ? { color: c.coral } : v != null ? { color: c.evergreen } : null]}>{formatPct(v)}</Text>
+      <Text style={[s.retValue, v != null && v < 0 ? { color: c.loss } : v != null ? { color: c.gain } : null]}>{formatPct(v)}</Text>
     </View>
   );
 }
@@ -78,13 +78,13 @@ export function FundList({ items, loading, error, ranked, emptyText = "No funds 
 
 const s = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: 16 },
-  rank: { width: 36, height: 36, borderRadius: 12, backgroundColor: c.evergreen, alignItems: "center", justifyContent: "center" },
-  rankText: { color: c.white, fontWeight: "900", fontSize: 15 },
-  avatar: { width: 40, height: 40, borderRadius: 12, backgroundColor: c.mintSoft, alignItems: "center", justifyContent: "center" },
-  avatarText: { color: c.evergreenDark, fontWeight: "900", fontSize: 17 },
-  name: { color: c.ink, fontSize: 15, fontWeight: "800", lineHeight: 21 },
-  meta: { color: c.muted, fontSize: 12, fontWeight: "600" },
-  rets: { flexDirection: "row", alignItems: "center", gap: 14 },
-  retLabel: { color: c.muted, fontSize: 11, fontWeight: "700" },
-  retValue: { color: c.ink, fontSize: 15, fontWeight: "800" },
+  rank: { width: 32, height: 32, borderRadius: 6, borderWidth: 1, borderColor: c.border, alignItems: "center", justifyContent: "center" },
+  rankText: { fontFamily: F, color: c.inkSoft, fontWeight: "600", fontSize: 13, fontVariant: ["tabular-nums"] },
+  avatar: { width: 36, height: 36, borderRadius: 6, backgroundColor: c.surfaceTint, alignItems: "center", justifyContent: "center" },
+  avatarText: { fontFamily: F, color: c.inkSoft, fontWeight: "600", fontSize: 14 },
+  name: { fontFamily: F, color: c.ink, fontSize: 15, fontWeight: "600", lineHeight: 21 },
+  meta: { fontFamily: F, color: c.muted, fontSize: 12 },
+  rets: { flexDirection: "row", alignItems: "center", gap: 18 },
+  retLabel: { fontFamily: F, color: c.muted, fontSize: 11, fontWeight: "500" },
+  retValue: { fontFamily: F, color: c.ink, fontSize: 15, fontWeight: "600", fontVariant: ["tabular-nums"] },
 });

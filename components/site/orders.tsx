@@ -12,7 +12,7 @@ function Box({ title, children, action }: { title: string; children: React.React
   return (
     <View style={{ backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.border, padding: 18, gap: 12 }}>
       <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", gap: 8 }}>
-        <Text style={{ color: c.ink, fontSize: 17, fontWeight: "800" }}>{title}</Text>
+        <Text style={{ color: c.ink, fontSize: 17, fontWeight: "600" }}>{title}</Text>
         {action}
       </View>
       {children}
@@ -31,7 +31,7 @@ export function MyOrders() {
       <Box title="Your orders">
         <Text style={{ color: c.inkSoft }}>Sign in to see the orders and SIPs you place on Surgam. The figures below are demo data.</Text>
         <Pressable accessibilityRole="button" onPress={() => router.push("/sign-in?next=/dashboard/investments" as never)}>
-          <Text style={{ color: c.evergreen, fontWeight: "800" }}>Sign in ›</Text>
+          <Text style={{ color: c.evergreen, fontWeight: "600" }}>Sign in ›</Text>
         </Pressable>
       </Box>
     );
@@ -41,7 +41,7 @@ export function MyOrders() {
       title="Your orders"
       action={
         <Pressable accessibilityRole="button" onPress={async () => { await clearInvestorToken(); await utils.invalidate(); }}>
-          <Text style={{ color: c.muted, fontWeight: "700" }}>Sign out</Text>
+          <Text style={{ color: c.muted, fontWeight: "600" }}>Sign out</Text>
         </Pressable>
       }
     >
@@ -51,7 +51,7 @@ export function MyOrders() {
       ) : (
         list.map((o) => (
           <View key={o.id} style={{ borderTopWidth: 1, borderTopColor: c.border, paddingTop: 10, gap: 2 }}>
-            <Text style={{ color: c.ink, fontWeight: "800" }} numberOfLines={2}>{o.schemeName}</Text>
+            <Text style={{ color: c.ink, fontWeight: "600" }} numberOfLines={2}>{o.schemeName}</Text>
             <Text style={{ color: c.inkSoft, fontSize: 13 }}>
               {o.kind === "SIP" ? `SIP on day ${o.sipDay}` : "One-time"} · {formatINR(o.amount)} · {label[o.status]} · {o.createdAt.slice(0, 10)}
             </Text>
@@ -59,7 +59,7 @@ export function MyOrders() {
         ))
       )}
       <Pressable accessibilityRole="button" onPress={() => router.push("/mutual-funds" as never)}>
-        <Text style={{ color: c.evergreen, fontWeight: "800" }}>Find a fund ›</Text>
+        <Text style={{ color: c.evergreen, fontWeight: "600" }}>Find a fund ›</Text>
       </Pressable>
     </Box>
   );
@@ -75,15 +75,15 @@ export function MySips() {
     <Box title="Your SIPs">
       {sips.data.map((s) => (
         <View key={s.id} style={{ borderTopWidth: 1, borderTopColor: c.border, paddingTop: 10, gap: 4 }}>
-          <Text style={{ color: c.ink, fontWeight: "800" }} numberOfLines={2}>{s.schemeName}</Text>
+          <Text style={{ color: c.ink, fontWeight: "600" }} numberOfLines={2}>{s.schemeName}</Text>
           <Text style={{ color: c.inkSoft, fontSize: 13 }}>{formatINR(s.amount)} on day {s.day} · next {s.nextRun} · {s.status.toLowerCase()}</Text>
           {s.status !== "STOPPED" ? (
             <View style={{ flexDirection: "row", gap: 16 }}>
               <Pressable accessibilityRole="button" onPress={() => set.mutate({ id: s.id, status: s.status === "ACTIVE" ? "PAUSED" : "ACTIVE" })}>
-                <Text style={{ color: c.evergreen, fontWeight: "800" }}>{s.status === "ACTIVE" ? "Pause" : "Resume"}</Text>
+                <Text style={{ color: c.evergreen, fontWeight: "600" }}>{s.status === "ACTIVE" ? "Pause" : "Resume"}</Text>
               </Pressable>
               <Pressable accessibilityRole="button" onPress={() => set.mutate({ id: s.id, status: "STOPPED" })}>
-                <Text style={{ color: c.coral, fontWeight: "800" }}>Stop</Text>
+                <Text style={{ color: c.coral, fontWeight: "600" }}>Stop</Text>
               </Pressable>
             </View>
           ) : null}

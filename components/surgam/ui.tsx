@@ -14,6 +14,7 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { surgam, type SurgamIconName } from "./theme";
 import { LanguagePicker } from "./language-picker";
+import { F } from "@/components/site/fonts";
 
 export { LanguagePicker };
 
@@ -266,9 +267,9 @@ const styles = StyleSheet.create({
   root: { flex: 1, flexDirection: "row", backgroundColor: surgam.colors.canvas },
   rail: { width: 248, backgroundColor: surgam.colors.surface, borderRightWidth: 1, borderRightColor: surgam.colors.border, paddingHorizontal: 24, paddingTop: 30, paddingBottom: 26 },
   brandRow: { flexDirection: "row", alignItems: "center", gap: 10 },
-  mark: { width: 38, height: 38, borderRadius: 13, backgroundColor: surgam.colors.evergreen, alignItems: "center", justifyContent: "center" },
-  markText: { color: surgam.colors.white, fontSize: 24, fontWeight: "800", fontStyle: "italic" },
-  wordmark: { color: surgam.colors.ink, fontSize: 24, fontWeight: "800", letterSpacing: -0.8 },
+  mark: { width: 30, height: 30, borderRadius: 6, backgroundColor: surgam.colors.evergreen, alignItems: "center", justifyContent: "center" },
+  markText: { fontFamily: F, color: surgam.colors.white, fontSize: 17, fontWeight: "700" },
+  wordmark: { fontFamily: F, color: surgam.colors.ink, fontSize: 20, fontWeight: "600", letterSpacing: -0.4 },
   railKicker: { color: surgam.colors.muted, fontSize: 10, letterSpacing: 1.3, fontWeight: "700", marginTop: 28, marginBottom: 16 },
   railNav: { gap: 7 },
   railItem: { minHeight: 52, borderRadius: 15, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 13 },

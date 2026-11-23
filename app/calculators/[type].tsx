@@ -23,7 +23,7 @@ export default function CalculatorPage() {
     );
   return (
     <SiteShell>
-      <Section kicker="Calculator" title={`${def.title} calculator`} subtitle={def.short}>
+      <Section kicker="Explore · Calculators" title={`${def.title} calculator`} subtitle={def.short}>
         <CalculatorTabs items={CALCULATORS} active={def.slug} onSelect={(slug) => router.replace(`/calculators/${slug}` as never)} />
         {/* key resets inputs when switching calculators */}
         <Calculator key={def.slug} def={def} />

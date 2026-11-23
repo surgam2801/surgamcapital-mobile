@@ -43,7 +43,7 @@ export default function GoalPlanning() {
             <NumberField label="Inflation" value={inflation} onChange={setInflation} suffix="%" step={0.5} min={0} max={20} />
             <NumberField label="Expected return" value={ret} onChange={setRet} suffix="%" step={0.5} min={0} max={25} />
             <Text style={t.body}>
-              Needs about <Text style={{ fontWeight: "900", color: c.evergreenDark }}>{formatINR(preview.monthlySip)} a month</Text> to reach {formatINR(preview.futureCost, { compact: true })}.
+              Needs about <Text style={{ fontWeight: "600", color: c.evergreenDark }}>{formatINR(preview.monthlySip)} a month</Text> to reach {formatINR(preview.futureCost, { compact: true })}.
             </Text>
             {me.data ? (
               <Button label="Save goal" icon="add" loading={add.isPending} disabled={!name.trim()} onPress={() => add.mutate({ name: name.trim(), kind, targetToday: target, years, inflationPct: inflation, returnPct: ret }, { onSuccess: () => setName("") })} />
@@ -76,7 +76,7 @@ export default function GoalPlanning() {
                           </Pressable>
                         </View>
                         <Text style={t.small}>{g.kind} · in {g.years} years · {formatINR(p.futureCost, { compact: true })}</Text>
-                        <Text style={[t.body, { fontWeight: "800", color: c.evergreenDark }]}>{formatINR(p.monthlySip)} / month</Text>
+                        <Text style={[t.body, { fontWeight: "600", color: c.evergreenDark }]}>{formatINR(p.monthlySip)} / month</Text>
                       </View>
                     );
                   })}

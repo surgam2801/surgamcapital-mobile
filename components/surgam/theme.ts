@@ -2,29 +2,33 @@ import { Platform } from "react-native";
 
 export const surgam = {
   colors: {
-    // Greens shifted ~12° toward blue (2026-11 rebuild); other roles unchanged.
-    ink: "#10201F",
-    inkSoft: "#485F5E",
-    muted: "#6D807F",
-    canvas: "#F5F8F7",
+    // Mature palette (2026-11): Surgam's teal, shifted toward blue and deepened;
+    // neutral cool greys instead of tinted ones; accents muted.
+    ink: "#0E1A22",
+    inkSoft: "#3E4C56",
+    muted: "#6A7781",
+    canvas: "#F6F7F9",
     surface: "#FFFFFF",
-    surfaceTint: "#EAF4F3",
-    border: "#DCE6E5",
-    evergreen: "#14787D",
-    evergreenDark: "#0E5A5F",
-    mint: "#BFE7E2",
-    mintSoft: "#E8F5F3",
-    blueSoft: "#E7F0FA",
-    blue: "#2F6BA8",
-    amberSoft: "#FFF3D6",
-    amber: "#A66A00",
-    coralSoft: "#FDE9E5",
-    coral: "#B94B3F",
+    surfaceTint: "#EFF3F5",
+    border: "#E1E6EB",
+    evergreen: "#0F6168", // primary
+    evergreenDark: "#0A3F45",
+    mint: "#A9CDD0",
+    mintSoft: "#EAF2F3",
+    blueSoft: "#EBF1F7",
+    blue: "#2C5D8F",
+    amberSoft: "#FBF3E4",
+    amber: "#8A5A0B",
+    coralSoft: "#FBECE9",
+    coral: "#A8443A",
     white: "#FFFFFF",
+    navy: "#0B1E2A", // dark bands (hero, footer)
+    gain: "#147A55",
+    loss: "#B23A31",
   },
   radii: {
-    card: 24,
-    control: 16,
+    card: 12,
+    control: 8,
     pill: 999,
   },
   spacing: {

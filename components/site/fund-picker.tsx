@@ -25,7 +25,7 @@ export function FundPicker({ value, onChange }: { value: Scheme | null; onChange
           {res.data.items.length === 0 ? <Text style={[t.small, { padding: 12 }]}>No funds found.</Text> : null}
           {res.data.items.map((s) => (
             <Pressable key={s.code} accessibilityRole="button" onPress={() => { onChange(s); setQ(""); }} style={({ pressed }) => ({ padding: 12, borderBottomWidth: 1, borderBottomColor: c.border, backgroundColor: pressed ? c.mintSoft : c.surface })}>
-              <Text style={[t.body, { color: c.ink, fontWeight: "700" }]} numberOfLines={1}>{s.name}</Text>
+              <Text style={[t.body, { color: c.ink, fontWeight: "600" }]} numberOfLines={1}>{s.name}</Text>
               <Text style={t.small}>{s.subCategory}</Text>
             </Pressable>
           ))}

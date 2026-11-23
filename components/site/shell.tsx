@@ -5,18 +5,25 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SurgamMark } from "@/components/surgam/ui";
 import { CALCULATORS, DISCLAIMER, EXPLORE_TOOLS, WAYS_TO_INVEST } from "@/shared/mf/content";
 import { trpc } from "@/lib/trpc";
-import { c, Container, Icon, useBreakpoint } from "./ui";
+import { c, Container, F, Icon, useBreakpoint } from "./ui";
 
-const NAV = [
-  { label: "Home", href: "/" },
-  { label: "Mutual Funds", href: "/mutual-funds" },
-  { label: "Explore", href: "/explore" },
-  { label: "Calculators", href: "/calculators" },
-  { label: "About us", href: "/about" },
+type Link = { label: string; href: string; blurb?: string };
+type NavGroup = { label: string; href?: string; match: string[]; items?: Link[] };
+
+const EXPLORE_LINKS: Link[] = [
+  ...EXPLORE_TOOLS.map((t) => ({ label: t.title, href: `/explore/${t.slug}`, blurb: t.blurb })),
+  { label: "Calculators", href: "/calculators", blurb: "Plan education, retirement, a home and more." },
 ];
 
-function isActive(pathname: string, href: string) {
-  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+const NAV: NavGroup[] = [
+  { label: "Home", href: "/", match: ["/"] },
+  { label: "Products", match: ["/mutual-funds", "/funds"], items: [{ label: "Mutual Funds", href: "/mutual-funds", blurb: "Research, compare and invest in over 3,000 funds." }] },
+  { label: "Explore", match: ["/explore", "/calculators"], items: EXPLORE_LINKS },
+  { label: "About us", href: "/about", match: ["/about"] },
+];
+
+function isActive(pathname: string, g: NavGroup) {
+  return g.match.some((m) => (m === "/" ? pathname === "/" : pathname.startsWith(m)));
 }
 
 function AccountButton({ onNavigate }: { onNavigate?: () => void }) {
@@ -31,11 +38,47 @@ function AccountButton({ onNavigate }: { onNavigate?: () => void }) {
         onNavigate?.();
         router.push((signedIn ? "/dashboard" : "/sign-in") as never);
       }}
-      style={({ pressed }) => [s.account, pressed && { opacity: 0.8 }]}
+      style={({ pressed }) => [s.account, pressed && { opacity: 0.85 }]}
     >
-      <Icon name={signedIn ? "person-circle-outline" : "log-in-outline"} size={18} color={c.white} />
       <Text style={s.accountText}>{signedIn ? "My account" : "Sign in"}</Text>
     </Pressable>
+  );
+}
+
+function Dropdown({ group, onGo, onClose }: { group: NavGroup; onGo: (href: string) => void; onClose: () => void }) {
+  const items = group.items ?? [];
+  const isProducts = group.label === "Products";
+  return (
+    <View pointerEvents="box-none" style={s.dropWrap}>
+      <Pressable accessible={false} onHoverOut={onClose} style={[s.drop, isProducts ? { width: 560 } : { width: 620 }]}>
+        {isProducts ? (
+          <View style={{ flexDirection: "row", gap: 24 }}>
+            <Pressable accessibilityRole="link" onPress={() => onGo("/mutual-funds")} style={({ hovered }: { hovered?: boolean }) => [s.dropFeature, hovered && { backgroundColor: c.surfaceTint }]}>
+              <Text style={s.dropTitle}>Mutual Funds</Text>
+              <Text style={s.dropBlurb}>{items[0]?.blurb}</Text>
+              <Text style={[s.dropBlurb, { color: c.evergreen, fontWeight: "600", marginTop: 8 }]}>Overview →</Text>
+            </Pressable>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text style={s.dropHead}>Ways to invest</Text>
+              {WAYS_TO_INVEST.map((w) => (
+                <Pressable key={w.slug} accessibilityRole="link" onPress={() => onGo(`/mutual-funds/${w.slug}`)} style={({ hovered }: { hovered?: boolean }) => [s.dropRow, hovered && { backgroundColor: c.surfaceTint }]}>
+                  <Text style={s.dropLink}>{w.title}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
+            {items.map((it) => (
+              <Pressable key={it.href} accessibilityRole="link" onPress={() => onGo(it.href)} style={({ hovered }: { hovered?: boolean }) => [s.dropItem, hovered && { backgroundColor: c.surfaceTint }]}>
+                <Text style={s.dropTitle}>{it.label}</Text>
+                {it.blurb ? <Text style={s.dropBlurb} numberOfLines={2}>{it.blurb}</Text> : null}
+              </Pressable>
+            ))}
+          </View>
+        )}
+      </Pressable>
+    </View>
   );
 }
 
@@ -44,10 +87,14 @@ export function SiteHeader() {
   const pathname = usePathname();
   const { isDesktop } = useBreakpoint();
   const [open, setOpen] = useState(false);
+  const [menu, setMenu] = useState<string | null>(null);
+  const [expanded, setExpanded] = useState<string | null>(null);
   const go = (href: string) => {
     setOpen(false);
+    setMenu(null);
     router.push(href as never);
   };
+  const activeGroup = NAV.find((g) => g.label === menu);
   return (
     <View style={s.header}>
       <Container style={s.headerRow}>
@@ -55,12 +102,24 @@ export function SiteHeader() {
           <SurgamMark />
         </Pressable>
         {isDesktop ? (
-          <View style={s.nav} accessibilityRole="menubar">
-            {NAV.map((n) => (
-              <Pressable key={n.href} accessibilityRole="link" onPress={() => go(n.href)} style={[s.navItem, isActive(pathname, n.href) && s.navItemActive]}>
-                <Text style={[s.navText, isActive(pathname, n.href) && s.navTextActive]}>{n.label}</Text>
-              </Pressable>
-            ))}
+          <View style={s.nav}>
+            {NAV.map((g) => {
+              const active = isActive(pathname, g);
+              return (
+                <Pressable
+                  key={g.label}
+                  accessibilityRole={g.items ? "button" : "link"}
+                  accessibilityState={g.items ? { expanded: menu === g.label } : undefined}
+                  onHoverIn={() => setMenu(g.items ? g.label : null)}
+                  onPress={() => (g.items ? setMenu(g.label) : go(g.href!))}
+                  style={s.navItem}
+                >
+                  <Text style={[s.navText, active && s.navTextActive]}>{g.label}</Text>
+                  {g.items ? <Icon name={menu === g.label ? "chevron-up" : "chevron-down"} size={14} color={active ? c.ink : c.muted} /> : null}
+                  {active ? <View style={s.navUnderline} /> : null}
+                </Pressable>
+              );
+            })}
           </View>
         ) : null}
         <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -72,14 +131,32 @@ export function SiteHeader() {
           ) : null}
         </View>
       </Container>
+
+      {isDesktop && activeGroup?.items ? <Dropdown group={activeGroup} onGo={go} onClose={() => setMenu(null)} /> : null}
+
       {!isDesktop && open ? (
         <View style={s.drawer}>
-          {NAV.map((n) => (
-            <Pressable key={n.href} accessibilityRole="link" onPress={() => go(n.href)} style={[s.drawerItem, isActive(pathname, n.href) && { backgroundColor: c.mintSoft }]}>
-              <Text style={[s.navText, { fontSize: 17 }, isActive(pathname, n.href) && s.navTextActive]}>{n.label}</Text>
-              <Icon name="chevron-forward" size={18} color={c.muted} />
-            </Pressable>
-          ))}
+          {NAV.map((g) =>
+            g.items ? (
+              <View key={g.label}>
+                <Pressable accessibilityRole="button" accessibilityState={{ expanded: expanded === g.label }} onPress={() => setExpanded(expanded === g.label ? null : g.label)} style={s.drawerItem}>
+                  <Text style={[s.drawerText, isActive(pathname, g) && s.navTextActive]}>{g.label}</Text>
+                  <Icon name={expanded === g.label ? "chevron-up" : "chevron-down"} size={18} color={c.muted} />
+                </Pressable>
+                {expanded === g.label
+                  ? g.items.map((it) => (
+                      <Pressable key={it.href} accessibilityRole="link" onPress={() => go(it.href)} style={s.drawerSub}>
+                        <Text style={s.drawerSubText}>{it.label}</Text>
+                      </Pressable>
+                    ))
+                  : null}
+              </View>
+            ) : (
+              <Pressable key={g.label} accessibilityRole="link" onPress={() => go(g.href!)} style={s.drawerItem}>
+                <Text style={[s.drawerText, isActive(pathname, g) && s.navTextActive]}>{g.label}</Text>
+              </Pressable>
+            ),
+          )}
         </View>
       ) : null}
     </View>
@@ -97,7 +174,7 @@ function FooterCol({ title, links }: { title: string; links: { label: string; hr
             <Text style={s.footLink}>{l.label}</Text>
           </Pressable>
         ) : (
-          <Text key={l.label} style={[s.footLink, { opacity: 0.7 }]}>{l.label}</Text>
+          <Text key={l.label} style={[s.footLink, { opacity: 0.6 }]}>{l.label}</Text>
         ),
       )}
     </View>
@@ -110,16 +187,19 @@ export function SiteFooter() {
     <View style={s.footer}>
       <Container>
         <View style={s.footTop}>
-          <View style={{ gap: 12, flexGrow: 1.4, flexBasis: isPhone ? "100%" : 220 }}>
-            <View style={s.footBrand}>
-              <SurgamMark />
+          <View style={{ gap: 14, flexGrow: 1.4, flexBasis: isPhone ? "100%" : 240 }}>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+              <View style={s.footMark}>
+                <Text style={s.footMarkText}>S</Text>
+              </View>
+              <Text style={s.footWord}>Surgam Capital</Text>
             </View>
             <Text style={s.footBody}>A calmer way to understand and grow your long-term money plan.</Text>
           </View>
-          <FooterCol title="Mutual Funds" links={[{ label: "Overview", href: "/mutual-funds" }, ...WAYS_TO_INVEST.map((w) => ({ label: w.title, href: `/mutual-funds/${w.slug}` }))]} />
-          <FooterCol title="Explore" links={EXPLORE_TOOLS.map((t) => ({ label: t.title, href: `/explore/${t.slug}` }))} />
+          <FooterCol title="Products" links={[{ label: "Mutual Funds", href: "/mutual-funds" }, ...WAYS_TO_INVEST.map((w) => ({ label: w.title, href: `/mutual-funds/${w.slug}` }))]} />
+          <FooterCol title="Explore" links={[...EXPLORE_TOOLS.map((t) => ({ label: t.title, href: `/explore/${t.slug}` })), { label: "Calculators", href: "/calculators" }]} />
           <FooterCol title="Calculators" links={CALCULATORS.map((x) => ({ label: x.title, href: `/calculators/${x.slug}` }))} />
-          <FooterCol title="Surgam" links={[{ label: "About us", href: "/about" }, { label: "FAQs", href: "/faqs" }, { label: "My account", href: "/dashboard" }, { label: "Contact details coming soon" }]} />
+          <FooterCol title="Company" links={[{ label: "About us", href: "/about" }, { label: "FAQs", href: "/faqs" }, { label: "My account", href: "/dashboard" }, { label: "Contact details coming soon" }]} />
         </View>
         <View style={s.footRule} />
         <Text style={s.footSmall}>{DISCLAIMER}</Text>
@@ -144,24 +224,38 @@ export function SiteShell({ children }: { children: ReactNode }) {
 }
 
 const s = StyleSheet.create({
-  header: { backgroundColor: c.surface, borderBottomWidth: 1, borderBottomColor: c.border, zIndex: 10 },
-  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", minHeight: 68, gap: 16 },
-  nav: { flexDirection: "row", gap: 4, flex: 1, justifyContent: "center" },
-  navItem: { paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12 },
-  navItemActive: { backgroundColor: c.mintSoft },
-  navText: { color: c.inkSoft, fontSize: 15, fontWeight: "700" },
-  navTextActive: { color: c.evergreenDark },
-  account: { flexDirection: "row", alignItems: "center", gap: 6, backgroundColor: c.evergreen, paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12 },
-  accountText: { color: c.white, fontSize: 14, fontWeight: "800" },
-  menuBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 12 },
-  drawer: { borderTopWidth: 1, borderTopColor: c.border, paddingVertical: 8, backgroundColor: c.surface },
+  header: { backgroundColor: c.surface, borderBottomWidth: 1, borderBottomColor: c.border, zIndex: 20 },
+  headerRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", minHeight: 64, gap: 16 },
+  nav: { flexDirection: "row", gap: 8, flex: 1, justifyContent: "center", alignSelf: "stretch" },
+  navItem: { flexDirection: "row", alignItems: "center", gap: 4, paddingHorizontal: 12, alignSelf: "stretch" },
+  navText: { fontFamily: F, color: c.inkSoft, fontSize: 14, fontWeight: "500" },
+  navTextActive: { color: c.ink, fontWeight: "600" },
+  navUnderline: { position: "absolute", left: 12, right: 12, bottom: -1, height: 2, backgroundColor: c.evergreen },
+  account: { backgroundColor: c.evergreen, paddingHorizontal: 16, paddingVertical: 9, borderRadius: 8 },
+  accountText: { fontFamily: F, color: c.white, fontSize: 14, fontWeight: "600" },
+  menuBtn: { width: 44, height: 44, alignItems: "center", justifyContent: "center", borderRadius: 8 },
+  dropWrap: { position: "absolute", top: 64, left: 0, right: 0, alignItems: "center", zIndex: 30 },
+  drop: { backgroundColor: c.surface, borderWidth: 1, borderColor: c.border, borderRadius: 12, padding: 12, shadowColor: c.navy, shadowOpacity: 0.1, shadowRadius: 24, shadowOffset: { width: 0, height: 12 } },
+  dropFeature: { width: 220, padding: 16, borderRadius: 8, backgroundColor: c.canvas, gap: 6 },
+  dropHead: { fontFamily: F, color: c.muted, fontSize: 11, fontWeight: "600", letterSpacing: 1, textTransform: "uppercase", paddingHorizontal: 10, paddingVertical: 6 },
+  dropRow: { paddingHorizontal: 10, paddingVertical: 8, borderRadius: 6 },
+  dropItem: { width: "50%", padding: 12, borderRadius: 8, gap: 2 },
+  dropTitle: { fontFamily: F, color: c.ink, fontSize: 14, fontWeight: "600" },
+  dropLink: { fontFamily: F, color: c.ink, fontSize: 14, fontWeight: "500" },
+  dropBlurb: { fontFamily: F, color: c.muted, fontSize: 13, lineHeight: 18 },
+  drawer: { borderTopWidth: 1, borderTopColor: c.border, paddingVertical: 6, backgroundColor: c.surface },
   drawerItem: { flexDirection: "row", justifyContent: "space-between", alignItems: "center", paddingHorizontal: 20, paddingVertical: 14 },
-  footer: { backgroundColor: c.ink, paddingVertical: 44 },
-  footTop: { flexDirection: "row", flexWrap: "wrap", gap: 28 },
-  footBrand: { alignSelf: "flex-start", backgroundColor: c.white, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
-  footBody: { color: "#C5D3D2", fontSize: 14, lineHeight: 21, maxWidth: 300 },
-  footHead: { color: c.white, fontSize: 14, fontWeight: "800", marginBottom: 2 },
-  footLink: { color: "#C5D3D2", fontSize: 14 },
-  footRule: { height: 1, backgroundColor: "#2A3D3C", marginVertical: 24 },
-  footSmall: { color: "#9FB1B0", fontSize: 12, lineHeight: 18 },
+  drawerText: { fontFamily: F, color: c.ink, fontSize: 16, fontWeight: "500" },
+  drawerSub: { paddingLeft: 36, paddingRight: 20, paddingVertical: 11 },
+  drawerSubText: { fontFamily: F, color: c.inkSoft, fontSize: 15 },
+  footer: { backgroundColor: c.navy, paddingVertical: 56 },
+  footTop: { flexDirection: "row", flexWrap: "wrap", gap: 32 },
+  footMark: { width: 28, height: 28, borderRadius: 6, backgroundColor: c.evergreen, alignItems: "center", justifyContent: "center" },
+  footMarkText: { fontFamily: F, color: c.white, fontWeight: "600", fontSize: 15 },
+  footWord: { fontFamily: F, color: c.white, fontSize: 17, fontWeight: "600", letterSpacing: -0.3 },
+  footBody: { fontFamily: F, color: "#A7B4BD", fontSize: 14, lineHeight: 21, maxWidth: 300 },
+  footHead: { fontFamily: F, color: c.white, fontSize: 13, fontWeight: "600", marginBottom: 4 },
+  footLink: { fontFamily: F, color: "#A7B4BD", fontSize: 14 },
+  footRule: { height: 1, backgroundColor: "#1E3442", marginVertical: 28 },
+  footSmall: { fontFamily: F, color: "#7F8F9A", fontSize: 12, lineHeight: 18 },
 });

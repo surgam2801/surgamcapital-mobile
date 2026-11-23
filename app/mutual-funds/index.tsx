@@ -38,13 +38,13 @@ export default function MutualFunds() {
       <View style={s.hero}>
         <Container style={[s.heroRow, !isDesktop && { flexDirection: "column", alignItems: "flex-start" }]}>
           <View style={{ flex: 1, gap: 14 }}>
-            <Text style={[t.kicker, { color: c.mint }]}>Mutual funds</Text>
+            <Text style={[t.kicker, { color: "#8FB7BB" }]}>Products · Mutual funds</Text>
             <Text style={[t.h1, { color: c.white }, isPhone && { fontSize: 32, lineHeight: 39 }]} accessibilityRole="header">
               Mutual fund investing, made simple.
             </Text>
-            <Text style={[t.lead, { color: "#D6E6E5" }]}>Research over a thousand funds, start a SIP in minutes and track every rupee in one place.</Text>
+            <Text style={[t.lead, { color: "#B4C2CB" }]}>Research over a thousand funds, start a SIP in minutes and track every rupee in one place.</Text>
             <View style={{ flexDirection: "row", gap: 12, flexWrap: "wrap" }}>
-              <Button label="Invest now" variant="light" icon="arrow-forward" size="lg" href="/sign-in" />
+              <Button label="Invest now" variant="light" size="lg" href="/sign-in" />
               <Button label="Compare performance" variant="outlineLight" size="lg" href="/explore/performance" />
             </View>
           </View>
@@ -85,8 +85,8 @@ export default function MutualFunds() {
 }
 
 const s = StyleSheet.create({
-  hero: { backgroundColor: c.evergreenDark, paddingVertical: 56 },
+  hero: { backgroundColor: c.navy, paddingVertical: 72 },
   heroRow: { flexDirection: "row", alignItems: "center", gap: 32 },
-  search: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: c.surface, borderWidth: 1, borderColor: c.border, borderRadius: 16, paddingHorizontal: 16, minHeight: 52 },
+  search: { flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: c.surface, borderWidth: 1, borderColor: c.border, borderRadius: 8, paddingHorizontal: 14, minHeight: 48 },
   searchInput: { flex: 1, fontSize: 16, color: c.ink, paddingVertical: 12 },
 });

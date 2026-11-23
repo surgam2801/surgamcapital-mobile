@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { CALCULATORS, TOP_LISTS, WAYS_TO_INVEST } from "@/shared/mf/content";
-import { Button, c, Card, Grid, Icon, IconTile, styles as t } from "./ui";
+import { Button, c, Card, F, Grid, Icon, IconTile, styles as t } from "./ui";
 export function WaysToInvestGrid() {
   const router = useRouter();
   return (
@@ -11,7 +11,7 @@ export function WaysToInvestGrid() {
           <IconTile icon={w.icon} tone={(["teal", "blue", "amber", "teal", "blue", "amber"] as const)[i % 6]} />
           <Text style={t.h3}>{w.title}</Text>
           <Text style={t.body}>{w.short}</Text>
-          <Text style={s.more}>Learn more ›</Text>
+          <Text style={s.more}>Learn more →</Text>
         </Card>
       ))}
     </Grid>
@@ -39,10 +39,10 @@ export function TopListsGrid() {
 export function CalculatorStrip() {
   const router = useRouter();
   return (
-    <Grid min={170} gap={12}>
+    <Grid min={140} gap={12}>
       {CALCULATORS.map((x) => (
         <Card key={x.slug} onPress={() => router.push(`/calculators/${x.slug}` as never)} accessibilityLabel={`${x.title} calculator`} style={{ alignItems: "flex-start" }}>
-          <Icon name={x.icon} size={24} color={c.evergreen} />
+          <IconTile icon={x.icon} />
           <Text style={t.h4}>{x.title}</Text>
           <Text style={t.small}>{x.short}</Text>
         </Card>
@@ -52,5 +52,5 @@ export function CalculatorStrip() {
 }
 
 const s = StyleSheet.create({
-  more: { color: c.evergreen, fontWeight: "800", fontSize: 14, marginTop: "auto" },
+  more: { fontFamily: F, color: c.evergreen, fontWeight: "600", fontSize: 14, marginTop: "auto", paddingTop: 6 },
 });

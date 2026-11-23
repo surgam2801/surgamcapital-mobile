@@ -59,6 +59,9 @@ export const store = {
     save();
     return o;
   },
+  findOrderByKey(investorId: string, key: string) {
+    return data.orders.find((o) => o.investorId === investorId && o.idempotencyKey === key) ?? null;
+  },
   ordersFor(investorId: string) {
     return data.orders.filter((o) => o.investorId === investorId).sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
   },

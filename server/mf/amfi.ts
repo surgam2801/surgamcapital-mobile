@@ -35,6 +35,25 @@ export function broadCategory(header: string): { category: BroadCategory; subCat
   return { category, subCategory: sub.replace(/[^\x20-\x7E]/g, "'") };
 }
 
+const ACRONYMS = new Set(["ICICI", "HDFC", "SBI", "UTI", "IDFC", "DSP", "HSBC", "PSU", "ELSS", "ETF", "FOF", "US", "USA", "NASDAQ", "S&P", "BSE", "NSE", "AMC", "IT", "PGIM", "LIC", "JM", "ITI", "NJ", "TRUST", "MSCI", "CRISIL", "IDCW", "AAA", "PSE", "MNC", "ESG", "II", "III", "IV", "V"]);
+
+/** Some AMFI names arrive in ALL CAPS; show them in normal title case, keeping known acronyms. */
+export function tidyName(name: string) {
+  const letters = name.replace(/[^A-Za-z]/g, "");
+  const upper = name.replace(/[^A-Z]/g, "").length;
+  if (letters.length === 0 || upper / letters.length < 0.7) return name;
+  return name
+    .toLowerCase()
+    .split(/(\s+|-|\/|\()/)
+    .map((w) => {
+      const u = w.toUpperCase();
+      if (ACRONYMS.has(u) && u !== "TRUST") return u;
+      return w.charAt(0).toUpperCase() + w.slice(1);
+    })
+    .join("")
+    .replace(/\b(And|Of|The|To|In|For)\b/g, (m, _p, offset) => (offset === 0 ? m : m.toLowerCase()));
+}
+
 export function parseNavAll(text: string): Scheme[] {
   const out: Scheme[] = [];
   let header = "";
@@ -68,7 +87,7 @@ export function parseNavAll(text: string): Scheme[] {
     if (/direct/i.test(label)) continue;
     if (/idcw|dividend|bonus/i.test(label)) continue;
     const { category, subCategory } = broadCategory(header);
-    const displayName = plan || option ? `${name.trim()}${plan ? ` - ${plan.trim()}` : ""}${option ? ` - ${option.replace(/ Option$/i, "").trim()}` : ""}` : name.trim();
+    const displayName = plan || option ? `${tidyName(name.trim())}${plan ? ` - ${plan.trim()}` : ""}${option ? ` - ${option.replace(/ Option$/i, "").trim()}` : ""}` : tidyName(name.trim());
     out.push({
       code: code.trim(),
       name: displayName,

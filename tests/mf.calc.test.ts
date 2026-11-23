@@ -71,3 +71,20 @@ describe("formatINR", () => {
     expect(formatINR(25_00_000, { compact: true })).toBe("₹25.00 L");
   });
 });
+
+describe("readable numbers and names", () => {
+  it("formats amounts the Indian way, with words", async () => {
+    const { formatIndian, amountInWords, formatDate, formatPct } = await import("../shared/mf/calc");
+    expect(formatIndian(1500000)).toBe("15,00,000");
+    expect(amountInWords(1500000)).toBe("₹15 lakh");
+    expect(amountInWords(25000000)).toBe("₹2.5 crore");
+    expect(formatDate("2026-11-20")).toBe("20 Nov 2026");
+    expect(formatPct(12.333)).toBe("▲ 12.33%");
+    expect(formatPct(-1.5)).toBe("▼ 1.50%");
+  });
+  it("title-cases ALL CAPS fund names but keeps acronyms", async () => {
+    const { tidyName } = await import("../server/mf/amfi");
+    expect(tidyName("ICICI PRUDENTIAL TRANSPORTATION AND LOGISTICS FUND")).toBe("ICICI Prudential Transportation and Logistics Fund");
+    expect(tidyName("Parag Parikh Flexi Cap Fund")).toBe("Parag Parikh Flexi Cap Fund");
+  });
+});

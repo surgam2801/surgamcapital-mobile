@@ -173,7 +173,7 @@ export const investorAuthRouter = router({
     if (!phone) throw new TRPCError({ code: "BAD_REQUEST", message: "Enter a valid 10-digit Indian mobile number." });
     return requestOtp(phone);
   }),
-  verifyOtp: publicProcedure.input(z.object({ phone: z.string(), otp: z.string().regex(/^\d{6}$/) })).mutation(async ({ input }) => {
+  verifyOtp: publicProcedure.input(z.object({ phone: z.string(), otp: z.string().regex(/^\d{6}$/, { message: "Enter the 6-digit code from the SMS." }) })).mutation(async ({ input }) => {
     const phone = normalisePhone(input.phone);
     if (!phone) throw new TRPCError({ code: "BAD_REQUEST", message: "Enter a valid mobile number." });
     const res = await verifyOtp(phone, input.otp);
@@ -186,8 +186,22 @@ export const investorAuthRouter = router({
 
 export const ordersRouter = router({
   place: investorProcedure
-    .input(z.object({ code: z.string(), kind: z.enum(["LUMPSUM", "SIP"]), amount: z.number().min(100).max(1e8), sipDay: z.number().int().min(1).max(28).optional(), stepUpPct: z.number().min(0).max(50).default(0) }))
+    .input(
+      z.object({
+        code: z.string(),
+        kind: z.enum(["LUMPSUM", "SIP"]),
+        amount: z.number({ message: "Enter an amount." }).min(100, { message: "Enter an amount of at least ₹100." }).max(1e8, { message: "For amounts above ₹10 crore, please contact us." }),
+        sipDay: z.number().int().min(1).max(28).optional(),
+        stepUpPct: z.number().min(0).max(50).default(0),
+        // Same key = same order. Protects against double taps and network retries.
+        idempotencyKey: z.string().min(8).max(80).optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
+      if (input.idempotencyKey) {
+        const existing = store.findOrderByKey(ctx.investor.id, input.idempotencyKey);
+        if (existing) return { order: existing, sip: store.sipsFor(ctx.investor.id).find((x) => x.orderId === existing.id) ?? null, duplicate: true };
+      }
       const s = await getScheme(input.code);
       if (!s) throw new TRPCError({ code: "NOT_FOUND", message: "Fund not found" });
       const min = input.kind === "SIP" ? 500 : 1000;
@@ -203,16 +217,20 @@ export const ordersRouter = router({
         sipDay: input.sipDay,
         status: "PENDING_PAYMENT",
         createdAt: now,
+        idempotencyKey: input.idempotencyKey,
       });
       let sip = null;
       if (input.kind === "SIP") {
         const day = input.sipDay ?? 5;
-        sip = store.addSip({ id: newId("sip"), investorId: ctx.investor.id, code: s.code, schemeName: s.name, amount: input.amount, day, stepUpPct: input.stepUpPct, status: "ACTIVE", nextRun: nextRunDate(day), createdAt: now });
+        sip = store.addSip({ id: newId("sip"), investorId: ctx.investor.id, orderId: order.id, code: s.code, schemeName: s.name, amount: input.amount, day, stepUpPct: input.stepUpPct, status: "ACTIVE", nextRun: nextRunDate(day), createdAt: now });
       }
-      return { order, sip };
+      return { order, sip, duplicate: false };
     }),
   // Simulated payment until a payment gateway / exchange is connected.
   confirmPayment: investorProcedure.input(z.object({ id: z.string() })).mutation(({ ctx, input }) => {
+    // Idempotent: paying an order twice never changes it twice.
+    const current = store.ordersFor(ctx.investor.id).find((o) => o.id === input.id);
+    if (current && current.status !== "PENDING_PAYMENT") return current;
     const o = store.updateOrder(input.id, ctx.investor.id, { status: "SUBMITTED" });
     if (!o) throw new TRPCError({ code: "NOT_FOUND", message: "Order not found" });
     return o;

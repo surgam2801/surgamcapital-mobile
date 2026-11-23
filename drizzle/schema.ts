@@ -272,6 +272,19 @@ export const recurringPlans = mysqlTable("recurring_plans", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+// Investor goals used by Explore > Goal planning (mirrors the API's Goal type).
+export const investmentGoals = mysqlTable("investment_goals", {
+  id: int("id").autoincrement().primaryKey(),
+  investorId: int("investor_id").notNull(),
+  name: varchar("name", { length: 60 }).notNull(),
+  kind: varchar("kind", { length: 40 }).notNull(),
+  targetToday: decimal("target_today", { precision: 14, scale: 2 }).notNull(),
+  years: int("years").notNull(),
+  inflationPct: decimal("inflation_pct", { precision: 5, scale: 2 }).notNull(),
+  returnPct: decimal("return_pct", { precision: 5, scale: 2 }).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
 // ============================================================================
 // 6. SURVEILLANCE, COMPLIANCE & BROKERAGE (CMP-01..07, PAY-01..06)
 // ============================================================================

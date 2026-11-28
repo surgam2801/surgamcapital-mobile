@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/surgam_test
+    username: surgam
+    password: test
+  jpa:
+    hibernate:
+      ddl-auto: validate
+  data:
+    redis:
+      host: localhost
+      port: 6379
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

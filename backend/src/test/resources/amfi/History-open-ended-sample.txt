@@ -1,0 +1,8 @@
+Scheme Code;NAV Name;Plan;Option;ISIN Div Payout/ISIN Growth;ISIN Div Reinvestment;Net Asset Value;Date
+
+Open Ended Schemes ( Money Market )
+
+
+Taurus Mutual Fund
+139619;Taurus Investor Education Pool - Unclaimed Dividend - Growth;;;;;10.0000;01-Jan-2026
+139619;Taurus Investor Education Pool - Unclaimed Dividend - Growth;;;;;10.0000;02-Jan-2026

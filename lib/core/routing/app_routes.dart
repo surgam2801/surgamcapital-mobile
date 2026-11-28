@@ -1,0 +1,30 @@
+class AppRoutes {
+  static const landing = '/';
+  static const login = '/login';
+  static const otp = '/otp';
+  static const forgotPassword = '/forgot-password';
+  static const resetPassword = '/reset-password';
+  static const registration = '/register';
+  static const dashboard = '/investor';
+  static const onboarding = '/investor/onboarding';
+  static const schemeDiscovery = '/investor/funds';
+  static const schemeDetail = '/investor/funds';
+  static const portfolio = '/investor/portfolio';
+  static const portfolioHolding = '/investor/portfolio/holding';
+  static const portfolioSips = '/investor/portfolio/sips';
+  static const portfolioTransactions = '/investor/portfolio/transactions';
+  static const portfolioOrders = '/investor/portfolio/orders';
+  static const portfolioAllocation = '/investor/portfolio/allocation';
+  static const watchlist = '/investor/watchlist';
+  static const compareFunds = '/investor/compare';
+  static const calculators = '/calculators';
+  static const calculator = '/calculators';
+  static const education = '/education';
+  static const article = '/education/:slug';
+  static const about = '/about';
+  static const contact = '/contact';
+  static const privacy = '/privacy';
+  static const terms = '/terms';
+  static const risk = '/risk';
+  static const unknown = '/404';
+}

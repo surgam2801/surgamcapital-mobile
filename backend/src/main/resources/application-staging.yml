@@ -1,0 +1,13 @@
+spring:
+  jpa:
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+surgam:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS}

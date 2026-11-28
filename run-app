@@ -1,0 +1,109 @@
+#!/bin/bash
+set -euo pipefail
+
+project_root="$(cd "$(dirname "$0")" && pwd)"
+cd "$project_root"
+
+flutter_bin="${FLUTTER_BIN:-$HOME/development/flutter-sdk-3.44.2-arm64/flutter/bin/flutter}"
+port="${PORT:-8083}"
+open_windows="${OPEN_WINDOWS:-true}"
+
+if ! [[ "$port" =~ ^[0-9]+$ ]] || ((port < 1024 || port > 65535)); then
+  echo "PORT must be a number between 1024 and 65535." >&2
+  exit 2
+fi
+
+if [[ ! -x "$flutter_bin" ]]; then
+  if command -v flutter >/dev/null 2>&1; then
+    flutter_bin="$(command -v flutter)"
+  else
+    echo "Flutter was not found. Set FLUTTER_BIN to your Flutter executable." >&2
+    exit 1
+  fi
+fi
+
+url="http://127.0.0.1:$port"
+server_pid=""
+
+cleanup() {
+  if [[ -n "$server_pid" ]]; then
+    kill "$server_pid" 2>/dev/null || true
+    wait "$server_pid" 2>/dev/null || true
+  fi
+}
+trap cleanup EXIT
+trap 'exit 130' INT TERM
+
+is_flutter_server() {
+  curl -fsS --max-time 2 "$url/" 2>/dev/null |
+    grep -Eq 'flutter_bootstrap\.js|main\.dart\.js'
+}
+
+if lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1; then
+  echo "Port $port is already in use. Stop that service or choose another port with PORT=8084 ./run-app." >&2
+  lsof -nP -iTCP:"$port" -sTCP:LISTEN >&2 || true
+  exit 1
+fi
+
+echo "Starting Flutter web preview at $url"
+echo "Preview mode uses mock authentication and the bundled AMFI sample; it does not require the backend, PostgreSQL, or Redis."
+echo "Flutter build and runtime logs will appear below."
+"$flutter_bin" run \
+  --no-dds \
+  -d web-server \
+  --web-hostname 127.0.0.1 \
+  --web-port "$port" \
+  --dart-define=AUTH_MODE=mock \
+  --dart-define=AMFI_SAMPLE_MODE=true \
+  --dart-define=PORTFOLIO_DEMO_MODE=true &
+server_pid=$!
+
+ready=false
+for _ in {1..180}; do
+  if is_flutter_server; then
+    ready=true
+    break
+  fi
+  if ! kill -0 "$server_pid" 2>/dev/null; then
+    echo "Flutter web server stopped before it became ready; see the Flutter output above." >&2
+    exit 1
+  fi
+  sleep 1
+done
+
+if [[ "$ready" != true ]]; then
+  echo "Timed out waiting for the Flutter web server at $url; see the Flutter output above." >&2
+  exit 1
+fi
+
+if [[ "$open_windows" == true ]]; then
+  echo "Opening desktop and phone-sized browser windows for $url"
+  if [[ -d "/Applications/Safari.app" ]]; then
+    osascript - "$url" <<'APPLESCRIPT'
+on run argv
+  set targetURL to item 1 of argv
+  tell application "Safari"
+    activate
+    make new document with properties {URL:targetURL}
+    delay 1
+    set bounds of front window to {0, 25, 1440, 925}
+    make new document with properties {URL:targetURL}
+    delay 1
+    set bounds of front window to {40, 60, 430, 904}
+  end tell
+end run
+APPLESCRIPT
+  elif [[ -d "/Applications/Google Chrome.app" ]]; then
+    open -na "Google Chrome" --args --new-window --window-size=1440,900 "$url"
+    open -na "Google Chrome" --args --app="$url" --window-size=390,844
+  else
+    open "$url"
+    echo "No supported browser app was found for separate resized windows." >&2
+    echo "Use your browser's responsive design tools to set a 390x844 viewport." >&2
+  fi
+else
+  echo "Browser launch disabled by OPEN_WINDOWS=$open_windows."
+fi
+
+echo "Flutter web server is running at $url. Press Ctrl+C here to stop it."
+wait "$server_pid"

@@ -1,0 +1,58 @@
+spring:
+  application:
+    name: surgam-auth
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  flyway:
+    enabled: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+  jackson:
+    time-zone: UTC
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+server:
+  port: 8081
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+surgam:
+  auth:
+    jwt:
+      issuer: ${JWT_ISSUER:https://auth.surgamcapital.example}
+      audience: ${JWT_AUDIENCE:surgam-investor-app}
+      secret: ${JWT_HMAC_SECRET}
+      access-ttl: ${JWT_ACCESS_TTL:PT15M}
+      refresh-ttl: ${JWT_REFRESH_TTL:P14D}
+    otp:
+      hmac-secret: ${OTP_HMAC_SECRET}
+      ttl: ${OTP_TTL:PT5M}
+      max-attempts: ${OTP_MAX_ATTEMPTS:5}
+  onboarding:
+    pan-hmac-secret: ${PAN_HMAC_SECRET}
+    encryption-key: ${PAN_ENCRYPTION_KEY}
+  mutual-fund:
+    seed-mock-data: ${MUTUAL_FUND_MOCK_DATA_ENABLED:false}
+    amfi:
+      sync-cron: ${AMFI_NAV_SYNC_CRON:-}
+      backfill-chunk-days: ${AMFI_BACKFILL_CHUNK_DAYS:7}
+      admin-user-ids: ${AMFI_ADMIN_USER_IDS:}
+      retry-attempts: ${AMFI_RETRY_ATTEMPTS:4}
+      retry-backoff: ${AMFI_RETRY_BACKOFF:PT1S}
+      connect-timeout: ${AMFI_CONNECT_TIMEOUT:PT5S}
+      read-timeout: ${AMFI_READ_TIMEOUT:PT45S}
